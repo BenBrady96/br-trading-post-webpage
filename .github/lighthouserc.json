@@ -13,6 +13,7 @@
       "numberOfRuns": 1,
       "settings": {
         "chromeFlags": "--no-sandbox --headless=new",
+        "blockedUrlPatterns": ["*cloudflareinsights.com*"],
         "skipAudits": ["errors-in-console"]
       }
     },

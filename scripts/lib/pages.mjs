@@ -28,9 +28,11 @@ const MARKETS = [['ebay', 'eBay'], ['etsy', 'Etsy']];
 export const socialLinks = () => SOCIALS.filter(([id]) => isSet(SITE.socials[id])).map(([id, name]) => ({ id, name, url: SITE.socials[id] }));
 export const marketLinks = () => MARKETS.filter(([id]) => isSet(SITE.marketplaces[id])).map(([id, name]) => ({ id, name, url: SITE.marketplaces[id] }));
 
+export const analyticsOn = (siteUrl) => isSet(SITE.analyticsToken) && siteUrl.startsWith('https:');
+
 export function csp({ siteUrl, apiUrl }) {
   const api = new URL(apiUrl).origin;
-  const analytics = isSet(SITE.analyticsToken);
+  const analytics = analyticsOn(siteUrl);
   const parts = [
     "default-src 'self'",
     `script-src 'self' 'inline-speculation-rules'${analytics ? ' https://static.cloudflareinsights.com' : ''}`,
@@ -299,9 +301,9 @@ export function sectionGrid({ id, title, link, items, level = 3 }) {
 </section>`;
 }
 
-function analyticsTag() {
-  if (!isSet(SITE.analyticsToken)) return '';
-  return `  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="${esc(JSON.stringify({ token: SITE.analyticsToken }))}"></script>`;
+function analyticsTag(siteUrl) {
+  if (!analyticsOn(siteUrl)) return '';
+  return `  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="${esc(JSON.stringify({ token: SITE.analyticsToken }))}"></script>`;
 }
 
 export async function renderPage(ctx, page) {
@@ -332,7 +334,7 @@ export async function renderPage(ctx, page) {
     categoryIds: CATEGORIES.map((c) => c.id).join(' '),
     preload: page.preload || '',
     script: page.script || 'page',
-    analytics: analyticsTag(),
+    analytics: analyticsTag(siteUrl),
     jsonLd: jsonScript(page.jsonLd),
     page: page.id,
     icons,

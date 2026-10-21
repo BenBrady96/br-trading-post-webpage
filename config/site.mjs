@@ -23,7 +23,7 @@ export const SITE = {
     ebay: 'https://www.ebay.co.uk/usr/br_trading_post',
     etsy: 'TODO: Etsy shop URL',
   },
-  analyticsToken: 'TODO: Cloudflare Web Analytics token',
+  analyticsToken: '736c5a1da0b947ffb964efea589fc6f1',
   indexNowKey: '5ba4b0c93b707677f4c77e8c89bbd4b3',
 };
 

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { cardHtml, crumbsHtml, csp, itemSummary, promoHtml, sitemapXml } from '../../scripts/lib/pages.mjs';
+import { analyticsOn, cardHtml, crumbsHtml, csp, itemSummary, promoHtml, sitemapXml } from '../../scripts/lib/pages.mjs';
 
 const item = {
   id: 'ebay-205512340001',
@@ -55,6 +55,13 @@ test('the CSP is strict and only adds https upgrades on https sites', () => {
   assert.match(policy, /upgrade-insecure-requests;$/);
   assert.ok(!/unsafe-inline|unsafe-eval/.test(policy));
   assert.ok(!csp({ siteUrl: 'http://localhost:8080/', apiUrl: 'http://localhost:8080/__api/' }).includes('upgrade-insecure-requests'));
+});
+
+test('analytics only loads on the live https site, never in local previews', () => {
+  assert.ok(analyticsOn('https://brtradingpost.co.uk/'));
+  assert.ok(!analyticsOn('http://localhost:8080/'));
+  assert.match(csp({ siteUrl: 'https://brtradingpost.co.uk/', apiUrl: 'https://api.brtradingpost.co.uk/' }), /script-src 'self' 'inline-speculation-rules' https:\/\/static\.cloudflareinsights\.com;.*connect-src 'self' https:\/\/api\.brtradingpost\.co\.uk https:\/\/cloudflareinsights\.com;/);
+  assert.ok(!csp({ siteUrl: 'http://localhost:8080/', apiUrl: 'http://localhost:8080/__api/' }).includes('cloudflareinsights'));
 });
 
 test('sitemaps list pages, dates and images', () => {
