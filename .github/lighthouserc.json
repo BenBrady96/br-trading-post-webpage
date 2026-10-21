@@ -14,7 +14,7 @@
       "settings": {
         "chromeFlags": "--no-sandbox --headless=new",
         "blockedUrlPatterns": ["*cloudflareinsights.com*"],
-        "skipAudits": ["errors-in-console"]
+        "skipAudits": ["errors-in-console", "is-crawlable"]
       }
     },
     "assert": {

@@ -198,6 +198,13 @@ check(await exists(join(DIST, `${SITE.indexNowKey}.txt`)), 'IndexNow key file ex
 const notFound = await readFile(join(DIST, '404.html'), 'utf8');
 check(/noindex/.test(meta(notFound, 'name', 'robots') || ''), '404 page is noindex');
 for (const c of CATEGORIES) check(await exists(join(DIST, 'shop', c.id, 'index.html')), `category page exists: ${c.id}`);
+for (const path of ['index.html', 'shop/index.html', 'promotions/index.html', 'about/index.html', 'contact/index.html', 'delivery-returns/index.html', 'privacy/index.html', 'terms/index.html', 'accessibility/index.html']) check(indexable.has(path), `${path} can be indexed`);
+for (const path of htmlFiles.map(rel).filter((p) => p.startsWith('item/'))) check(indexable.has(path), `${path} can be indexed`);
+for (const c of CATEGORIES) {
+  const path = `shop/${c.id}/index.html`;
+  const cards = ((await readFile(join(DIST, path), 'utf8')).match(/<li class="card[ "]/g) || []).length;
+  check(indexable.has(path) === cards > 0, `${path}: ${cards ? `has ${cards} items, so it must be indexable` : 'has no items yet, so it must be noindex'}`);
+}
 
 const css = await readFile(join(DIST, 'css', 'styles.css'), 'utf8');
 const tokens = tokenBlocks(css);
