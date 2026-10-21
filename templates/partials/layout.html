@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en-GB" data-root="{{root}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="{{csp}}">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}">
+  <meta name="robots" content="{{robots}}">
+  <link rel="canonical" href="{{canonical}}">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#15100B" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:type" content="{{ogType}}">
+  <meta property="og:site_name" content="BR Trading Post">
+  <meta property="og:title" content="{{ogTitle}}">
+  <meta property="og:description" content="{{description}}">
+  <meta property="og:url" content="{{canonical}}">
+  <meta property="og:image" content="{{ogImage}}">
+  <meta property="og:image:alt" content="{{ogImageAlt}}">
+  <meta property="og:locale" content="en_GB">
+{{{ogExtra}}}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ogTitle}}">
+  <meta name="twitter:description" content="{{description}}">
+  <meta name="twitter:image" content="{{ogImage}}">
+  <meta name="twitter:image:alt" content="{{ogImageAlt}}">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="img/icons/favicon-48.png" sizes="48x48" type="image/png">
+  <link rel="icon" href="img/icons/favicon-96.png" sizes="96x96" type="image/png">
+  <link rel="icon" href="img/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="BR Trading Post">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="preconnect" href="{{apiOrigin}}" crossorigin>
+  <link rel="preload" href="fonts/literata-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+{{{preload}}}
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/shared/theme-init.js"></script>
+  <script type="module" src="js/pages/{{script}}.js"></script>
+{{{analytics}}}
+  <script type="speculationrules">{"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"selector_matches":"[rel~=nofollow], [data-no-prerender]"}}]},"eagerness":"moderate"}]}</script>
+  <script type="application/ld+json">{{{jsonLd}}}</script>
+</head>
+<body class="page-{{page}}" data-api="{{apiUrl}}" data-built="{{built}}" data-categories="{{categoryIds}}">
+{{{icons}}}
+<div class="page-loader" id="page-loader" role="status" aria-live="polite">
+  <svg class="page-loader__cog" aria-hidden="true"><use href="#i-cog"/></svg>
+  <span class="page-loader__text">Loading...</span>
+</div>
+<a class="skip-link" href="#main">Skip to content</a>
+{{{header}}}
+<main id="main" class="main" tabindex="-1">
+{{{body}}}
+</main>
+{{{footer}}}
+{{{tabbar}}}
+{{{fab}}}
+{{{more}}}
+<div class="toasts" id="toasts" aria-live="polite"></div>
+</body>
+</html>

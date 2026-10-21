@@ -1,0 +1,39 @@
+<div class="wrap page-head page-head--tight">
+{{{crumbs}}}
+</div>
+
+<article class="wrap item{{soldClass}}" data-item="{{id}}" data-status="{{status}}">
+  <div class="item__gallery" data-gallery>
+    <figure class="item__main">
+{{{mainImage}}}
+      <span class="sold-band" aria-hidden="true">Sold out</span>
+    </figure>
+{{{thumbs}}}
+  </div>
+
+  <div class="item__info">
+    <p class="item__meta">
+      <span class="badge badge--{{source}}"><svg aria-hidden="true"><use href="#i-{{source}}"/></svg>{{sourceName}}</span>
+      <a class="badge badge--plain" href="shop/{{category}}/">{{categoryName}}</a>
+    </p>
+    <h1 class="item__title">{{title}}</h1>
+    <p class="item__price" data-price>{{price}}</p>
+    <p class="item__status" data-status-text><span class="dot" aria-hidden="true"></span><span>{{statusText}}</span></p>
+    <p class="item__summary">{{summary}}</p>
+
+    <div class="item__buy">
+{{{buy}}}
+      <button type="button" class="btn btn--ghost" data-share data-share-title="{{title}}"><svg aria-hidden="true"><use href="#i-share"/></svg>Share</button>
+    </div>
+
+    <ul class="assurances">
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg><span>{{protection}}</span></li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg><span>Delivery options and costs are shown on the {{sourceName}} listing</span></li>
+    </ul>
+
+{{{specifics}}}
+{{{description}}}
+  </div>
+</article>
+
+{{{related}}}

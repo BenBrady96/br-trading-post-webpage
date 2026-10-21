@@ -1,0 +1,22 @@
+<header class="topbar">
+  <div class="wrap topbar__inner">
+    <a class="brand" href="./">
+      <img class="brand__mark" src="img/brand/mark-96.webp" srcset="img/brand/mark-96.webp 1x, img/brand/mark-192.webp 2x" width="40" height="40" alt="">
+      <span class="brand__name">BR Trading Post</span>
+    </a>
+    <nav class="topnav" aria-label="Main">
+{{{topnav}}}
+    </nav>
+    <div class="topbar__actions">
+      <a class="icon-btn" href="shop/#search" aria-label="Search the shop"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <button class="icon-btn desktop-only" type="button" popovertarget="pop-theme" aria-label="Colour theme"><svg aria-hidden="true" data-theme-icon><use href="#i-monitor"/></svg></button>
+{{{marketButtons}}}
+    </div>
+  </div>
+</header>
+<div class="pop" id="pop-theme" popover>
+  <p class="pop__label">Theme</p>
+  <button type="button" class="pop__item" data-theme-choice="auto"><svg aria-hidden="true"><use href="#i-monitor"/></svg>Auto</button>
+  <button type="button" class="pop__item" data-theme-choice="light"><svg aria-hidden="true"><use href="#i-sun"/></svg>Light</button>
+  <button type="button" class="pop__item" data-theme-choice="dark"><svg aria-hidden="true"><use href="#i-moon"/></svg>Dark</button>
+</div>

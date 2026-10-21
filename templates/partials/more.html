@@ -1,0 +1,20 @@
+<dialog class="sheet" id="more-sheet" aria-labelledby="more-title">
+  <div class="sheet__inner">
+    <div class="sheet__grip" aria-hidden="true"></div>
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="more-title">More</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+    <div class="sheet__body">
+{{{groups}}}
+      <section class="menu__group" aria-labelledby="more-theme">
+        <h3 class="menu__label" id="more-theme">Appearance</h3>
+        <div class="seg" role="group" aria-labelledby="more-theme">
+          <button type="button" class="seg__btn" data-theme-choice="auto"><svg aria-hidden="true"><use href="#i-monitor"/></svg>Auto</button>
+          <button type="button" class="seg__btn" data-theme-choice="light"><svg aria-hidden="true"><use href="#i-sun"/></svg>Light</button>
+          <button type="button" class="seg__btn" data-theme-choice="dark"><svg aria-hidden="true"><use href="#i-moon"/></svg>Dark</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</dialog>

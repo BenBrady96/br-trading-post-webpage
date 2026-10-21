@@ -1,0 +1,57 @@
+<div class="wrap page-head">
+{{{crumbs}}}
+{{{logo}}}
+  <h1 class="page-title">{{heading}}</h1>
+{{{lead}}}
+</div>
+
+<div class="wrap page-body">
+  <nav class="chips" aria-label="Categories">
+{{{chips}}}
+  </nav>
+
+  <div class="toolbar" data-toolbar data-category="{{categoryId}}">
+    <label class="search">
+      <svg class="search__icon" aria-hidden="true"><use href="#i-search"/></svg>
+      <span class="sr-only">Search</span>
+      <input class="search__input" id="search" type="search" placeholder="{{searchPlaceholder}}" autocomplete="off" enterkeyhint="search" data-search>
+    </label>
+    <div class="toolbar__row">
+      <div class="seg seg--sm" role="group" aria-label="Availability">
+        <button type="button" class="seg__btn" data-filter="status" data-value="all" aria-pressed="true">All</button>
+        <button type="button" class="seg__btn" data-filter="status" data-value="available" aria-pressed="false">In stock</button>
+        <button type="button" class="seg__btn" data-filter="status" data-value="sold" aria-pressed="false">Sold</button>
+      </div>
+      <div class="seg seg--sm" role="group" aria-label="Marketplace">
+        <button type="button" class="seg__btn" data-filter="source" data-value="all" aria-pressed="true">All</button>
+        <button type="button" class="seg__btn" data-filter="source" data-value="ebay" aria-pressed="false"><svg aria-hidden="true"><use href="#i-ebay"/></svg><span class="sr-only">eBay</span></button>
+        <button type="button" class="seg__btn" data-filter="source" data-value="etsy" aria-pressed="false"><svg aria-hidden="true"><use href="#i-etsy"/></svg><span class="sr-only">Etsy</span></button>
+      </div>
+      <label class="select">
+        <span class="sr-only">Sort by</span>
+        <select class="select__input" data-sort>
+          <option value="newest">Newest</option>
+          <option value="price-asc">Price, low to high</option>
+          <option value="price-desc">Price, high to low</option>
+        </select>
+        <svg class="select__caret" aria-hidden="true"><use href="#i-caret"/></svg>
+      </label>
+    </div>
+  </div>
+
+  <div class="results">
+    <p class="results__count" data-results role="status">{{resultsText}}</p>
+    <span class="section__status" data-live-status></span>
+  </div>
+
+{{{grid}}}
+
+  <div class="empty" data-no-results hidden>
+    <svg class="empty__icon" aria-hidden="true"><use href="#i-search"/></svg>
+    <h2 class="empty__title">Nothing matches</h2>
+    <p>Try a different search or show all items.</p>
+    <button type="button" class="btn btn--outline" data-clear-filters>Show all items</button>
+  </div>
+</div>
+
+{{{after}}}
