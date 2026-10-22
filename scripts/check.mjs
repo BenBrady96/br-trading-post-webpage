@@ -25,7 +25,10 @@ const decode = (s) => String(s ?? '').replace(/&(#\d+|#x[0-9a-f]+|\w+);/gi, (m, 
   if (e[0] === '#') return String.fromCodePoint(e[1].toLowerCase() === 'x' ? parseInt(e.slice(2), 16) : Number(e.slice(1)));
   return m;
 });
-const attr = (tag, name) => decode(new RegExp(`\\s${name}="([^"]*)"`, 'i').exec(tag)?.[1] ?? null);
+const attr = (tag, name) => {
+  const match = [...tag.matchAll(/\s([\w:-]+)="([^"]*)"/g)].find((m) => m[1].toLowerCase() === name);
+  return match ? decode(match[2]) : null;
+};
 const meta = (html, key, value) => {
   const tag = [...html.matchAll(/<meta\b[^>]*>/gi)].map((m) => m[0]).find((t) => attr(t, key) === value);
   return tag ? attr(tag, 'content') : null;
