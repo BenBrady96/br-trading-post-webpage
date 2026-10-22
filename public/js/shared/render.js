@@ -3,7 +3,7 @@ import { endsText, formatPrice } from '../core/format.js';
 import { SOURCES, isSold } from '../core/shop.js';
 import { el, icon, rootUrl } from './dom.js';
 
-const EXT = 'noopener noreferrer';
+const EXT = { target: '_blank', rel: 'noopener noreferrer', 'aria-describedby': 'new-tab' };
 const LINK_LABELS = { tiktok: 'TikTok', instagram: 'Instagram', facebook: 'Facebook', ebay: 'eBay', website: 'Website' };
 
 const isBuilt = (item) => (Date.parse(item.addedAt || '') || 0) <= builtAt();
@@ -25,7 +25,7 @@ export function cardNode(item, { level = 3 } = {}) {
     img ? imageNode(img, item.title, '(min-width: 1280px) 300px, (min-width: 900px) 23vw, 46vw') : el('span', { class: 'card__placeholder' }, icon('i-cards')),
     el('span', { class: 'sold-band', 'aria-hidden': 'true', text: 'Sold out' }));
   const external = !isBuilt(item);
-  const link = el('a', { class: 'card__link', href: itemHref(item), rel: external ? EXT : null },
+  const link = el('a', { class: 'card__link', href: itemHref(item), ...(external ? EXT : {}) },
     media,
     el('div', { class: 'card__body' },
       el('p', { class: 'card__source' }, icon(`i-${item.source}`), el('span', { text: SOURCES[item.source] || '' })),
@@ -84,8 +84,8 @@ export function promoNode(promo, { level = 2 } = {}) {
     });
     return para;
   });
-  const links = (promo.links || []).map((l) => el('a', { class: 'icon-btn icon-btn--soft', href: l.url, rel: EXT, 'aria-label': l.label || LINK_LABELS[l.type] || 'Link' }, icon(`i-${l.type === 'website' ? 'link' : l.type}`)));
-  const button = promo.button ? el('a', { class: 'btn btn--primary', href: promo.button.url, rel: EXT }, promo.button.text, icon('i-external')) : null;
+  const links = (promo.links || []).map((l) => el('a', { class: 'icon-btn icon-btn--soft', href: l.url, ...EXT, 'aria-label': l.label || LINK_LABELS[l.type] || 'Link' }, icon(`i-${l.type === 'website' ? 'link' : l.type}`)));
+  const button = promo.button ? el('a', { class: 'btn btn--primary', href: promo.button.url, ...EXT }, promo.button.text, icon('i-external')) : null;
   const timer = el('p', { class: 'promo__timer', 'data-countdown': true, hidden: true }, icon('i-clock'), el('span'));
   return el('article', { class: 'promo', 'data-promo': promo.id, 'data-ends': promo.endsAt, 'data-starts': promo.startsAt || null },
     media,

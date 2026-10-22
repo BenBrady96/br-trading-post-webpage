@@ -164,6 +164,8 @@ for (const file of htmlFiles) {
     const target = new URL(href, new URL(path, siteUrl));
     if (target.origin !== site.origin) {
       check(/noopener/.test(attr(tag, 'rel') || ''), `${label}: external link has rel="noopener": ${href}`);
+      check(attr(tag, 'target') === '_blank', `${label}: external link opens in a new tab: ${href}`);
+      check(attr(tag, 'aria-describedby') === 'new-tab', `${label}: external link says it opens in a new tab: ${href}`);
       check(target.protocol === 'https:', `${label}: external link uses https: ${href}`);
     }
   }

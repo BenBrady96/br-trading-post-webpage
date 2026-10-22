@@ -20,7 +20,7 @@ export const categoryName = (id) => CATEGORY[id]?.name ?? CATEGORY['other-tcg'].
 
 const NOUNS = { pokemon: 'Pokémon card', 'one-piece': 'One Piece card', lorcana: 'Disney Lorcana card', 'yu-gi-oh': 'Yu-Gi-Oh! card', 'other-tcg': 'trading card', 'custom-binders': 'custom binder' };
 const PROTECTION = { ebay: 'Price includes eBay’s Buyer Protection, with secure checkout on eBay' };
-const EXT = 'rel="noopener noreferrer"';
+const EXT = 'target="_blank" rel="noopener noreferrer" aria-describedby="new-tab"';
 const icon = (id, cls) => `<svg${cls ? ` class="${cls}"` : ''} aria-hidden="true"><use href="#${id}"/></svg>`;
 
 const SOCIALS = [['tiktok', 'TikTok'], ['instagram', 'Instagram'], ['facebook', 'Facebook']];
