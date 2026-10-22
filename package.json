@@ -2,7 +2,7 @@
   "name": "br-trading-post",
   "version": "1.0.0",
   "private": true,
-  "description": "BR Trading Post: Pokémon, One Piece, Disney Lorcana and Yu-Gi-Oh! cards and custom painted binders, sold on eBay and Etsy.",
+  "description": "BR Trading Post: Pokémon, One Piece, Disney Lorcana and Yu-Gi-Oh! cards and custom painted binders, sold on eBay.",
   "type": "module",
   "engines": {
     "node": ">=24"

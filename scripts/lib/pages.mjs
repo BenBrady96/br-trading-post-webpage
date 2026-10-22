@@ -19,12 +19,12 @@ export const CATEGORY = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
 export const categoryName = (id) => CATEGORY[id]?.name ?? CATEGORY['other-tcg'].name;
 
 const NOUNS = { pokemon: 'Pokémon card', 'one-piece': 'One Piece card', lorcana: 'Disney Lorcana card', 'yu-gi-oh': 'Yu-Gi-Oh! card', 'other-tcg': 'trading card', 'custom-binders': 'custom binder' };
-const PROTECTION = { ebay: 'Secure checkout on eBay, with eBay’s buyer protection', etsy: 'Secure checkout on Etsy, with Etsy’s purchase protection' };
+const PROTECTION = { ebay: 'Secure checkout on eBay, with eBay’s buyer protection' };
 const EXT = 'rel="noopener noreferrer"';
 const icon = (id, cls) => `<svg${cls ? ` class="${cls}"` : ''} aria-hidden="true"><use href="#${id}"/></svg>`;
 
 const SOCIALS = [['tiktok', 'TikTok'], ['instagram', 'Instagram'], ['facebook', 'Facebook']];
-const MARKETS = [['ebay', 'eBay'], ['etsy', 'Etsy']];
+const MARKETS = [['ebay', 'eBay']];
 export const socialLinks = () => SOCIALS.filter(([id]) => isSet(SITE.socials[id])).map(([id, name]) => ({ id, name, url: SITE.socials[id] }));
 export const marketLinks = () => MARKETS.filter(([id]) => isSet(SITE.marketplaces[id])).map(([id, name]) => ({ id, name, url: SITE.marketplaces[id] }));
 
@@ -37,7 +37,7 @@ export function csp({ siteUrl, apiUrl }) {
     "default-src 'self'",
     `script-src 'self' 'inline-speculation-rules'${analytics ? ' https://static.cloudflareinsights.com' : ''}`,
     "style-src 'self'",
-    `img-src 'self' data: ${api} https://i.ebayimg.com https://i.etsystatic.com`,
+    `img-src 'self' data: ${api} https://i.ebayimg.com`,
     "font-src 'self'",
     `connect-src 'self' ${api}${analytics ? ' https://cloudflareinsights.com' : ''}`,
     "manifest-src 'self'",
@@ -171,7 +171,7 @@ function emptyStockHtml(level = 3) {
 </div>`;
 }
 
-const LINK_TYPES = { tiktok: 'TikTok', instagram: 'Instagram', facebook: 'Facebook', ebay: 'eBay', etsy: 'Etsy', website: 'Website' };
+const LINK_TYPES = { tiktok: 'TikTok', instagram: 'Instagram', facebook: 'Facebook', ebay: 'eBay', website: 'Website' };
 
 export function promoHtml(promo, { level = 2, eager = false } = {}) {
   const img = promo.image;
@@ -221,7 +221,7 @@ function marketsHtml() {
       ? `      <a class="btn btn--outline market-btn" href="${esc(url)}" ${EXT}>${icon(`i-${id}`, 'market-btn__logo')}<span><span class="sr-only">Visit our </span>${name}<span class="sr-only"> shop</span></span>${icon('i-external')}</a>`
       : `      <span class="market-btn market-btn--soon">${icon(`i-${id}`, 'market-btn__logo')}${name} coming soon</span>`;
   });
-  return `    <div class="markets-row">\n      <p class="markets-row__label">Our shops</p>\n${links.join('\n')}\n    </div>`;
+  return `    <div class="markets-row">\n      <p class="markets-row__label">Our shop</p>\n${links.join('\n')}\n    </div>`;
 }
 
 function fabHtml() {
@@ -371,7 +371,7 @@ export async function homePage(ctx) {
     path: 'index.html',
     title: SITE.name,
     ogTitle: 'BR Trading Post | Pokémon, One Piece & Lorcana Cards UK',
-    description: 'UK trading card shop selling Pokémon, One Piece, Disney Lorcana and Yu-Gi-Oh! cards, other card games and custom painted binders on eBay and Etsy.',
+    description: 'UK trading card shop selling Pokémon, One Piece, Disney Lorcana and Yu-Gi-Oh! cards, other card games and custom painted binders on eBay.',
     script: 'home',
     active: 'home',
     body,
@@ -426,8 +426,8 @@ ${category.faq.map(([q, a]) => `      <h3>${esc(q)}</h3>\n      <p>${esc(a)}</p>
   });
   const name = category ? category.title : 'Shop Trading Cards & Custom Binders';
   const description = category
-    ? `${category.blurb} Shop ${category.heading} from BR Trading Post, a UK card shop, with live stock from our eBay and Etsy shops.`
-    : 'Shop Pokémon, One Piece, Disney Lorcana and Yu-Gi-Oh! cards, other card games and custom painted binders, live from our eBay and Etsy shops.';
+    ? `${category.blurb} Shop ${category.heading} from BR Trading Post, a UK card shop, with live stock from our eBay shop.`
+    : 'Shop Pokémon, One Piece, Disney Lorcana and Yu-Gi-Oh! cards, other card games and custom painted binders, live from our eBay shop.';
   return {
     id: category ? 'category' : 'shop',
     path,
@@ -559,9 +559,9 @@ export const contactPage = (ctx) => docPage(ctx, {
   },
 });
 
-export const deliveryPage = (ctx) => docPage(ctx, { id: 'delivery', path: 'delivery-returns/', file: 'delivery-returns.html', title: 'Delivery & Returns', crumb: 'Delivery & returns', active: 'more', description: 'How delivery, cancellations and returns work when you buy from BR Trading Post on eBay or Etsy, and your rights under UK consumer law.' });
+export const deliveryPage = (ctx) => docPage(ctx, { id: 'delivery', path: 'delivery-returns/', file: 'delivery-returns.html', title: 'Delivery & Returns', crumb: 'Delivery & returns', active: 'more', description: 'How delivery, cancellations and returns work when you buy from BR Trading Post on eBay, and your rights under UK consumer law.' });
 export const privacyPage = (ctx) => docPage(ctx, { id: 'privacy', path: 'privacy/', file: 'privacy.html', title: 'Privacy & Cookies', crumb: 'Privacy & cookies', active: 'more', description: 'How BR Trading Post handles your information. No cookies, no tracking and cookieless visitor statistics. Your rights under UK data protection law.' });
-export const termsPage = (ctx) => docPage(ctx, { id: 'terms', path: 'terms/', file: 'terms.html', title: 'Terms of Use', crumb: 'Terms of use', active: 'more', description: 'The terms for using the BR Trading Post website. Purchases are made on eBay or Etsy, and your consumer rights are not affected.' });
+export const termsPage = (ctx) => docPage(ctx, { id: 'terms', path: 'terms/', file: 'terms.html', title: 'Terms of Use', crumb: 'Terms of use', active: 'more', description: 'The terms for using the BR Trading Post website. Purchases are made on eBay, and your consumer rights are not affected.' });
 export const accessibilityPage = (ctx) => docPage(ctx, { id: 'accessibility', path: 'accessibility/', file: 'accessibility.html', title: 'Accessibility', crumb: 'Accessibility', active: 'more', description: 'How the BR Trading Post website meets WCAG 2.2 AA, its known limitations, and how to tell us about a problem.' });
 
 export async function notFoundPage(ctx) {

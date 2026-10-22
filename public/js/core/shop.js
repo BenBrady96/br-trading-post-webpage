@@ -4,7 +4,7 @@ export const SORTS = {
   'price-desc': 'Price, high to low',
 };
 
-export const SOURCES = { ebay: 'eBay', etsy: 'Etsy' };
+export const SOURCES = { ebay: 'eBay' };
 
 export const itemPath = (item) => `item/${item.slug}/`;
 export const categoryPath = (id) => `shop/${id}/`;
@@ -39,9 +39,8 @@ export function matchesQuery(item, query, categoryName = '') {
   return wanted.every((w) => have.some((h) => h.startsWith(w)));
 }
 
-export function filterItems(items, { q = '', source = 'all', status = 'all', category = 'all', categoryNames = {} } = {}) {
-  return items.filter((item) => (source === 'all' || item.source === source)
-    && (category === 'all' || item.category === category)
+export function filterItems(items, { q = '', status = 'all', category = 'all', categoryNames = {} } = {}) {
+  return items.filter((item) => (category === 'all' || item.category === category)
     && (status === 'all' || (status === 'sold' ? isSold(item) : !isSold(item)))
     && matchesQuery(item, q, categoryNames[item.category]));
 }

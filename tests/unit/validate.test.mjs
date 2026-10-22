@@ -28,7 +28,7 @@ test('a good item is kept and tidied', () => {
 test('items with bad ids, slugs, prices or links are rejected', () => {
   for (const bad of [
     { id: 'ebay-1;drop' },
-    { id: 'etsy-123' },
+    { id: 'etsy-123', source: 'etsy', url: 'https://www.etsy.com/listing/123' },
     { slug: '../../etc' },
     { slug: 'Has Spaces' },
     { price: -1 },

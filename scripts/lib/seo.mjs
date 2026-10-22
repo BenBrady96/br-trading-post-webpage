@@ -20,7 +20,7 @@ const orgId = (siteUrl) => `${siteUrl}#store`;
 const siteId = (siteUrl) => `${siteUrl}#website`;
 
 export function sameAs() {
-  return [SITE.marketplaces.ebay, SITE.marketplaces.etsy, SITE.socials.tiktok, SITE.socials.instagram, SITE.socials.facebook].filter(isSet);
+  return [SITE.marketplaces.ebay, SITE.socials.tiktok, SITE.socials.instagram, SITE.socials.facebook].filter(isSet);
 }
 
 export function postalAddress() {

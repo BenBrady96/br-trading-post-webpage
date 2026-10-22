@@ -1,7 +1,7 @@
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const ID = /^(ebay|etsy)-[A-Za-z0-9]{1,40}$/;
-const LINK_TYPES = new Set(['tiktok', 'instagram', 'facebook', 'ebay', 'etsy', 'website']);
-const MARKET_HOSTS = { ebay: /(^|\.)ebay\.(co\.uk|com)$/, etsy: /(^|\.)etsy\.com$/ };
+const ID = /^ebay-[A-Za-z0-9]{1,40}$/;
+const LINK_TYPES = new Set(['tiktok', 'instagram', 'facebook', 'ebay', 'website']);
+const MARKET_HOSTS = { ebay: /(^|\.)ebay\.(co\.uk|com)$/ };
 
 export const text = (value, max) => (typeof value === 'string' ? value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '').trim().slice(0, max) : '');
 
@@ -29,7 +29,7 @@ function cleanImage(raw, opts) {
 export function cleanItem(raw, { allowHttp = false, categories = null, fallback = 'other-tcg' } = {}) {
   if (!raw || typeof raw !== 'object') return null;
   const id = text(raw.id, 48);
-  const source = raw.source === 'ebay' || raw.source === 'etsy' ? raw.source : null;
+  const source = raw.source === 'ebay' ? raw.source : null;
   const slug = text(raw.slug, 120);
   const title = text(raw.title, 200);
   const price = Number(raw.price);

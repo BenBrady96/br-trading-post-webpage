@@ -12,8 +12,9 @@ test('categoryFor sorts listings into the right category', () => {
   assert.equal(categoryFor({ title: 'MTG Foundations Play Booster Box' }), 'other-tcg');
   assert.equal(categoryFor({ title: 'Mystery card lot' }), 'other-tcg');
   assert.equal(categoryFor({ title: 'Custom Painted Pokémon Binder' }), 'custom-binders');
-  assert.equal(categoryFor({ title: 'Charizard 9 pocket binder', source: 'etsy' }), 'custom-binders');
-  assert.equal(categoryFor({ title: 'Official Pokémon 9 pocket binder', source: 'ebay' }), 'pokemon');
+  assert.equal(categoryFor({ title: 'Hand painted One Piece binder, 4 pocket' }), 'custom-binders');
+  assert.equal(categoryFor({ title: 'Charizard 9 pocket binder' }), 'pokemon');
+  assert.equal(categoryFor({ title: 'Official Pokémon 9 pocket binder' }), 'pokemon');
   assert.equal(categoryFor({ title: 'Booster box', specifics: [['Game', 'One Piece Card Game']] }), 'one-piece');
   assert.equal(categoryFor({ title: 'Luffy OP05-119', specifics: [['Game', 'Pokémon TCG']] }), 'one-piece');
 });

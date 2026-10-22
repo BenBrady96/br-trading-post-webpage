@@ -4,7 +4,7 @@ import { SOURCES, isSold } from '../core/shop.js';
 import { el, icon, rootUrl } from './dom.js';
 
 const EXT = 'noopener noreferrer';
-const LINK_LABELS = { tiktok: 'TikTok', instagram: 'Instagram', facebook: 'Facebook', ebay: 'eBay', etsy: 'Etsy', website: 'Website' };
+const LINK_LABELS = { tiktok: 'TikTok', instagram: 'Instagram', facebook: 'Facebook', ebay: 'eBay', website: 'Website' };
 
 const isBuilt = (item) => (Date.parse(item.addedAt || '') || 0) <= builtAt();
 

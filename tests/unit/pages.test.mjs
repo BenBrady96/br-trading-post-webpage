@@ -30,7 +30,7 @@ test('cards escape titles and show the Sold out state', () => {
 
 test('item summaries read naturally', () => {
   assert.equal(itemSummary(item), 'Used condition. This item sold for £89.99 on eBay. BR Trading Post is a UK Pokémon card shop, and we list new stock regularly.');
-  assert.equal(itemSummary({ ...item, status: 'available', condition: '', source: 'etsy', category: 'custom-binders' }), '£89.99 from BR Trading Post, a UK custom binder shop, on Etsy.');
+  assert.equal(itemSummary({ ...item, status: 'available', condition: '', category: 'custom-binders' }), '£89.99 from BR Trading Post, a UK custom binder shop, on eBay.');
 });
 
 test('promotions show a static end date and escape text', () => {

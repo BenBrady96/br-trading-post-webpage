@@ -20,7 +20,6 @@ const params = new URLSearchParams(location.search);
 const state = {
   q: params.get('q') || '',
   status: ['available', 'sold'].includes(params.get('status')) ? params.get('status') : 'all',
-  source: ['ebay', 'etsy'].includes(params.get('source')) ? params.get('source') : 'all',
   sort: ['price-asc', 'price-desc'].includes(params.get('sort')) ? params.get('sort') : 'newest',
 };
 
@@ -30,7 +29,6 @@ function saveState() {
   const next = new URLSearchParams();
   if (state.q) next.set('q', state.q);
   if (state.status !== 'all') next.set('status', state.status);
-  if (state.source !== 'all') next.set('source', state.source);
   if (state.sort !== 'newest') next.set('sort', state.sort);
   const query = next.toString();
   history.replaceState(history.state, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
@@ -51,7 +49,7 @@ function apply() {
   for (const node of nodes.values()) node.hidden = !ids.has(node.dataset.id);
   grid.append(...shown.map((item) => nodes.get(item.id)).filter(Boolean));
   const available = shown.filter((item) => item.status !== 'sold').length;
-  const filtered = state.q || state.status !== 'all' || state.source !== 'all';
+  const filtered = state.q || state.status !== 'all';
   results.textContent = items.length
     ? `${shown.length} ${shown.length === 1 ? 'item' : 'items'}${filtered ? ` of ${items.length}` : ''}, ${available} in stock`
     : 'No items yet';
@@ -95,7 +93,7 @@ toolbar.addEventListener('click', (event) => {
 
 document.querySelector('[data-clear-filters]')?.addEventListener('click', () => {
   clearTimeout(typing);
-  Object.assign(state, { q: '', status: 'all', source: 'all' });
+  Object.assign(state, { q: '', status: 'all' });
   paintControls({ withSearch: true });
   saveState();
   apply();
