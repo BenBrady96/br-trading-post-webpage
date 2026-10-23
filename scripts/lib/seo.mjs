@@ -24,9 +24,12 @@ export function sameAs() {
 }
 
 export function postalAddress() {
-  const { street, locality, postcode, country } = SITE.address;
-  if (![street, locality, postcode].every(isSet)) return undefined;
-  return { '@type': 'PostalAddress', streetAddress: street, addressLocality: locality, postalCode: postcode, addressCountry: country };
+  const { street, locality, region, postcode, country } = SITE.address;
+  if (!isSet(locality)) return undefined;
+  const node = { '@type': 'PostalAddress', addressLocality: locality, addressCountry: country };
+  if (isSet(region)) node.addressRegion = region;
+  if (isSet(street) && isSet(postcode)) Object.assign(node, { streetAddress: street, postalCode: postcode });
+  return node;
 }
 
 export function store(siteUrl) {

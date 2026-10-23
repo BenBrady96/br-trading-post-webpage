@@ -101,15 +101,26 @@ export function followHtml() {
 }
 
 function addressLine() {
-  const { street, locality, postcode } = SITE.address;
-  const parts = [street, locality, postcode].filter(isSet);
-  return parts.length === 3 ? parts.join(', ') : '';
+  const { street, locality, region, postcode } = SITE.address;
+  if (![street, locality, postcode].every(isSet)) return '';
+  return [street, locality, region, postcode].filter(isSet).join(', ');
+}
+
+function areaLine() {
+  const { locality, region } = SITE.address;
+  return isSet(locality) ? [locality, region].filter(isSet).join(', ') : '';
+}
+
+function basedIn() {
+  const address = addressLine();
+  if (address) return `based at ${address}`;
+  const area = areaLine();
+  return area ? `based near ${area}` : 'based in the UK';
 }
 
 export function controllerText() {
-  const address = addressLine();
-  if (isSet(SITE.owner)) return `BR Trading Post is a trading name of ${SITE.owner}, a sole trader based in the UK${address ? ` at ${address}` : ''}.`;
-  return `BR Trading Post is a sole trader business based in the UK${address ? ` at ${address}` : ''}.`;
+  if (isSet(SITE.owner)) return `BR Trading Post is a trading name of ${SITE.owner}, a sole trader ${basedIn()}.`;
+  return `BR Trading Post is a sole trader business ${basedIn()}.`;
 }
 
 function footerBusiness() {
@@ -118,10 +129,11 @@ function footerBusiness() {
 
 function contactBusiness() {
   const address = addressLine();
+  const area = areaLine();
   const rows = [
     ['Trading name', 'BR Trading Post'],
     isSet(SITE.owner) ? ['Owner', `${SITE.owner} (sole trader)`] : ['Business type', 'Sole trader'],
-    address ? ['Address', address] : null,
+    address ? ['Address', address] : area ? ['Location', `Near ${area}`] : null,
     ['Email', `<a href="mailto:${esc(SITE.email)}">${esc(SITE.email)}</a>`],
   ].filter(Boolean);
   return `<section class="panel panel--wide" aria-labelledby="business-title">
