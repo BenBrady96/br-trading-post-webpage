@@ -81,7 +81,7 @@ export const CATEGORIES = [
   },
   {
     id: 'lorcana',
-    logos: [],
+    logos: ['lorcana'],
     name: 'Disney Lorcana',
     title: 'Disney Lorcana Cards for Sale UK',
     heading: 'Disney Lorcana cards',

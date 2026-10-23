@@ -206,8 +206,10 @@ export function promoHtml(promo, { level = 2, eager = false } = {}) {
 </article>`;
 }
 
-const LOGO_SIZES = { pokemon: [327, 120], 'one-piece': [351, 120], 'yu-gi-oh': [343, 120], magic: [360, 119], digimon: [360, 104] };
-const LOGO_NAMES = { pokemon: 'Pokémon Trading Card Game', 'one-piece': 'One Piece', 'yu-gi-oh': 'Yu-Gi-Oh!', magic: 'Magic: The Gathering', digimon: 'Digimon' };
+const LOGO_SIZES = { pokemon: [327, 120], 'one-piece': [351, 120], lorcana: [273, 120], 'yu-gi-oh': [343, 120], magic: [360, 119], digimon: [360, 104] };
+const LOGO_NAMES = { pokemon: 'Pokémon Trading Card Game', 'one-piece': 'One Piece', lorcana: 'Disney Lorcana', 'yu-gi-oh': 'Yu-Gi-Oh!', magic: 'Magic: The Gathering', digimon: 'Digimon' };
+// Logos that are too dark to read on the dark theme; each has an img/games/<id>-dark-v2.webp twin.
+const LOGO_DARK = new Set(['magic']);
 
 export function logoPlate(category, { extra = '', lazy = true } = {}) {
   const loading = lazy ? ' loading="lazy"' : '';
@@ -215,12 +217,11 @@ export function logoPlate(category, { extra = '', lazy = true } = {}) {
   if (category.logos?.length) {
     inner = category.logos.map((id) => {
       const [w, h] = LOGO_SIZES[id];
-      return `<img src="img/games/${id}.webp" width="${w}" height="${h}" alt="${category.logos.length > 1 ? esc(LOGO_NAMES[id]) : ''}"${loading} decoding="async">`;
+      const img = (file, cls = '') => `<img${cls} src="img/games/${file}-v2.webp" width="${w}" height="${h}" alt="${category.logos.length > 1 ? esc(LOGO_NAMES[id]) : ''}"${loading} decoding="async">`;
+      return LOGO_DARK.has(id) ? img(id, ' class="logo-plate__light"') + img(`${id}-dark`, ' class="logo-plate__dark"') : img(id);
     }).join('');
-  } else if (category.id === 'custom-binders') {
-    inner = `<img class="logo-plate__mark" src="img/brand/mark-192.webp" width="96" height="96" alt=""${loading} decoding="async">`;
   } else {
-    inner = `<span class="logo-plate__word" aria-hidden="true"><small>Disney</small>Lorcana</span>`;
+    inner = `<img class="logo-plate__mark" src="img/brand/mark-192.webp" width="96" height="96" alt=""${loading} decoding="async">`;
   }
   const classes = ['logo-plate', category.logos?.length > 1 ? 'logo-plate--multi' : '', extra].filter(Boolean).join(' ');
   return `<span class="${classes}">${inner}</span>`;
