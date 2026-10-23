@@ -206,7 +206,7 @@ export function promoHtml(promo, { level = 2, eager = false } = {}) {
 </article>`;
 }
 
-const LOGO_SIZES = { pokemon: [327, 120], 'one-piece': [351, 120], 'yu-gi-oh': [346, 120], magic: [360, 119], digimon: [360, 104] };
+const LOGO_SIZES = { pokemon: [327, 120], 'one-piece': [351, 120], 'yu-gi-oh': [343, 120], magic: [360, 119], digimon: [360, 104] };
 const LOGO_NAMES = { pokemon: 'Pokémon Trading Card Game', 'one-piece': 'One Piece', 'yu-gi-oh': 'Yu-Gi-Oh!', magic: 'Magic: The Gathering', digimon: 'Digimon' };
 
 export function logoPlate(category, { extra = '', lazy = true } = {}) {
