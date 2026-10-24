@@ -5,9 +5,11 @@ import { boot } from '../shared/app.js';
 import { el } from '../shared/dom.js';
 import { startCountdowns, syncGrid, syncPromotions } from '../shared/live.js';
 import { showChecking } from '../shared/loader.js';
+import { initNewsletter } from '../shared/newsletter.js';
 import { setPromoDot } from '../shared/shell.js';
 
 boot();
+initNewsletter();
 
 const newSection = document.getElementById('new-title')?.closest('section');
 const featuredSection = document.getElementById('featured-title')?.closest('section');

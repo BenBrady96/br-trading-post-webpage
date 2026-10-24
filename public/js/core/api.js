@@ -20,6 +20,29 @@ export async function getJson(path, { timeout = 6000 } = {}) {
   }
 }
 
+export async function postJson(path, body, { timeout = 25000 } = {}) {
+  const apiBase = base();
+  if (!apiBase) return { ok: false, error: 'offline' };
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+  try {
+    const res = await fetch(new URL(path, apiBase), {
+      method: 'POST',
+      signal: controller.signal,
+      credentials: 'omit',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => null);
+    if (res.ok && data?.ok === true) return { ok: true, error: null };
+    return { ok: false, error: typeof data?.error === 'string' ? data.error : 'unavailable' };
+  } catch {
+    return { ok: false, error: 'offline' };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export async function fetchShop() {
   const data = await getJson('v1/shop');
   if (!data || !Array.isArray(data.items)) return null;

@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { CATEGORIES, SITE, isSet } from '../../config/site.mjs';
+import { CATEGORIES, SITE, addressLine, areaLine, controllerText, isSet } from '../../config/site.mjs';
 import { endsText, formatPrice, isLive } from '../../public/js/core/format.js';
 import { PROTECTION, itemDetails, itemSummary, paragraphs } from '../../public/js/core/item.js';
 import { SOURCES, counts, homeShelves, isSold, sortItems } from '../../public/js/core/shop.js';
@@ -29,16 +29,21 @@ export const marketLinks = () => MARKETS.filter(([id]) => isSet(SITE.marketplace
 
 export const analyticsOn = (siteUrl) => isSet(SITE.analyticsToken) && siteUrl.startsWith('https:');
 
+export const TURNSTILE = 'https://challenges.cloudflare.com';
+export const TURNSTILE_TEST_KEY = '1x00000000000000000000AA';
+export const turnstileKey = (siteUrl) => (siteUrl.startsWith('https:') && isSet(SITE.turnstileSiteKey) ? SITE.turnstileSiteKey : TURNSTILE_TEST_KEY);
+
 export function csp({ siteUrl, apiUrl }) {
   const api = new URL(apiUrl).origin;
   const analytics = analyticsOn(siteUrl);
   const parts = [
     "default-src 'self'",
-    `script-src 'self' 'inline-speculation-rules'${analytics ? ' https://static.cloudflareinsights.com' : ''}`,
+    `script-src 'self' 'inline-speculation-rules' ${TURNSTILE}${analytics ? ' https://static.cloudflareinsights.com' : ''}`,
     "style-src 'self'",
     `img-src 'self' data: ${api} https://i.ebayimg.com`,
     "font-src 'self'",
     `connect-src 'self' ${api}${analytics ? ' https://cloudflareinsights.com' : ''}`,
+    `frame-src ${TURNSTILE}`,
     "manifest-src 'self'",
     "worker-src 'self'",
     "object-src 'none'",
@@ -79,7 +84,7 @@ function menuGroups() {
   const item = (href, iconId, label, external = false) => `        <a class="menu__item" href="${esc(href)}"${external ? ` ${EXT}` : ''}>${icon(iconId)}<span>${label}</span>${icon(external ? 'i-external' : 'i-chevron', 'menu__end')}</a>`;
   const group = (title, id, rows) => (rows.length ? `      <section class="menu__group" aria-labelledby="more-${id}">\n        <h3 class="menu__label" id="more-${id}">${title}</h3>\n${rows.join('\n')}\n      </section>` : '');
   return [
-    group('Help', 'help', [item('contact/', 'i-mail', 'Contact us'), item('delivery-returns/', 'i-truck', 'Delivery &amp; returns')]),
+    group('Help', 'help', [item('contact/', 'i-mail', 'Contact us'), item('delivery-returns/', 'i-truck', 'Delivery &amp; returns'), item('newsletter/', 'i-bell', 'Newsletter')]),
     group('Shop on', 'shop', marketLinks().map((m) => item(m.url, `i-${m.id}`, m.name, true))),
     group('Follow us', 'follow', socialLinks().map((s) => item(s.url, `i-${s.id}`, s.name, true))),
     group('Legal', 'legal', [item('privacy/', 'i-shield', 'Privacy &amp; cookies'), item('terms/', 'i-doc', 'Terms of use'), item('accessibility/', 'i-access', 'Accessibility')]),
@@ -99,28 +104,7 @@ export function followHtml() {
   return `<ul class="pill-links">\n${list.map((s) => `  <li><a class="btn btn--outline" href="${esc(s.url)}" ${EXT}>${icon(`i-${s.id}`)}${s.name}</a></li>`).join('\n')}\n</ul>`;
 }
 
-function addressLine() {
-  const { street, locality, region, postcode } = SITE.address;
-  if (![street, locality, postcode].every(isSet)) return '';
-  return [street, locality, region, postcode].filter(isSet).join(', ');
-}
-
-function areaLine() {
-  const { locality, region } = SITE.address;
-  return isSet(locality) ? [locality, region].filter(isSet).join(', ') : '';
-}
-
-function basedIn() {
-  const address = addressLine();
-  if (address) return `based at ${address}`;
-  const area = areaLine();
-  return area ? `based near ${area}` : 'based in the UK';
-}
-
-export function controllerText() {
-  if (isSet(SITE.owner)) return `BR Trading Post is a trading name of ${SITE.owner}, a sole trader ${basedIn()}.`;
-  return `BR Trading Post is a sole trader business ${basedIn()}.`;
-}
+export { controllerText };
 
 function footerBusiness() {
   return `    <p>${esc(controllerText())} Email <a href="mailto:${esc(SITE.email)}">${esc(SITE.email)}</a>.</p>`;
@@ -351,6 +335,10 @@ export async function renderPage(ctx, page) {
 
 const common = (ctx) => [seo.store(ctx.siteUrl), seo.website(ctx.siteUrl)];
 
+export async function newsletterForm(ctx, id) {
+  return fill(await template('partials/newsletter-form.html'), { id, sitekey: turnstileKey(ctx.siteUrl), email: SITE.email });
+}
+
 export async function homePage(ctx) {
   const { items, promotions, siteUrl } = ctx;
   const { featured, newIn } = homeShelves(items);
@@ -361,6 +349,7 @@ export async function homePage(ctx) {
     featured: sectionGrid({ id: 'featured-title', title: 'Featured', items: featured }),
     newIn: newIn.length ? gridHtml(newIn, { level: 3 }) : emptyStockHtml(3),
     markets: marketsHtml(),
+    newsletterForm: await newsletterForm(ctx, 'home-signup'),
   });
   return {
     id: 'home',
@@ -559,6 +548,30 @@ export const contactPage = (ctx) => docPage(ctx, {
 export const deliveryPage = (ctx) => docPage(ctx, { id: 'delivery', path: 'delivery-returns/', file: 'delivery-returns.html', title: 'Delivery & Returns', crumb: 'Delivery & returns', active: 'more', description: 'How delivery, cancellations and returns work when you buy from BR Trading Post on eBay, and your rights under UK consumer law.' });
 export const privacyPage = (ctx) => docPage(ctx, { id: 'privacy', path: 'privacy/', file: 'privacy.html', title: 'Privacy & Cookies', crumb: 'Privacy & cookies', active: 'more', description: 'How BR Trading Post handles your information. No cookies, no tracking and cookieless visitor statistics. Your rights under UK data protection law.' });
 export const termsPage = (ctx) => docPage(ctx, { id: 'terms', path: 'terms/', file: 'terms.html', title: 'Terms of Use', crumb: 'Terms of use', active: 'more', description: 'The terms for using the BR Trading Post website. Purchases are made on eBay, and your consumer rights are not affected.' });
+export async function newsletterPage(ctx) {
+  const page = await docPage(ctx, {
+    id: 'newsletter', path: 'newsletter/', file: 'newsletter.html', title: 'Newsletter', crumb: 'Newsletter', active: 'more',
+    description: 'Get new trading cards, custom binders and promotions from BR Trading Post in your inbox every Monday. Free, and you can unsubscribe at any time.',
+    values: { form: await newsletterForm(ctx, 'signup') },
+  });
+  return { ...page, script: 'newsletter' };
+}
+
+async function tokenPage(ctx, options) {
+  const page = await docPage(ctx, { active: 'more', ...options });
+  return { ...page, script: 'newsletter', robots: 'noindex, follow', indexable: false };
+}
+
+export const newsletterConfirmPage = (ctx) => tokenPage(ctx, {
+  id: 'newsletter-confirm', path: 'newsletter/confirm/', file: 'newsletter-confirm.html', title: 'Confirm Your Sign-up', crumb: 'Confirm your sign-up',
+  description: 'Confirm your sign-up to the BR Trading Post newsletter to get our new stock and promotions every Monday.',
+});
+
+export const newsletterUnsubscribePage = (ctx) => tokenPage(ctx, {
+  id: 'newsletter-unsubscribe', path: 'newsletter/unsubscribe/', file: 'newsletter-unsubscribe.html', title: 'Unsubscribe', crumb: 'Unsubscribe',
+  description: 'Unsubscribe from the BR Trading Post newsletter. We stop emailing you straight away and delete your email address.',
+});
+
 export const accessibilityPage = (ctx) => docPage(ctx, { id: 'accessibility', path: 'accessibility/', file: 'accessibility.html', title: 'Accessibility', crumb: 'Accessibility', active: 'more', description: 'How the BR Trading Post website meets WCAG 2.2 AA, its known limitations, and how to tell us about a problem.' });
 
 export async function notFoundPage(ctx) {

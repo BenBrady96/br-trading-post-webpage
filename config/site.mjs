@@ -25,9 +25,33 @@ export const SITE = {
   },
   analyticsToken: '736c5a1da0b947ffb964efea589fc6f1',
   indexNowKey: '5ba4b0c93b707677f4c77e8c89bbd4b3',
+  turnstileSiteKey: '0x4AAAAAAFkZvWILE1GJIVIC',
 };
 
 export const isSet = (value) => typeof value === 'string' && value.trim() !== '' && !value.startsWith('TODO');
+
+export function addressLine() {
+  const { street, locality, region, postcode } = SITE.address;
+  if (![street, locality, postcode].every(isSet)) return '';
+  return [street, locality, region, postcode].filter(isSet).join(', ');
+}
+
+export function areaLine() {
+  const { locality, region } = SITE.address;
+  return isSet(locality) ? [locality, region].filter(isSet).join(', ') : '';
+}
+
+function basedIn() {
+  const address = addressLine();
+  if (address) return `based at ${address}`;
+  const area = areaLine();
+  return area ? `based near ${area}` : 'based in the UK';
+}
+
+export function controllerText() {
+  if (isSet(SITE.owner)) return `BR Trading Post is a trading name of ${SITE.owner}, a sole trader ${basedIn()}.`;
+  return `BR Trading Post is a sole trader business ${basedIn()}.`;
+}
 
 export const placeholders = () => {
   const found = [];

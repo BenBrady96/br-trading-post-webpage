@@ -1,0 +1,18 @@
+<div class="wrap page-head">
+{{{crumbs}}}
+  <h1 class="page-title">Unsubscribe</h1>
+  <p class="page-lead">Sorry to see you go. Press the button and we’ll stop emailing you straight away.</p>
+</div>
+
+<div class="wrap">
+  <section class="panel panel--wide token-action" data-token-action="unsubscribe" aria-labelledby="unsubscribe-title">
+    <svg class="panel__icon" aria-hidden="true"><use href="#i-mail"/></svg>
+    <h2 class="panel__title" id="unsubscribe-title">Stop the weekly email</h2>
+    <p data-intro>We’ll delete your email address from our list.</p>
+    <button class="btn btn--primary btn--lg" type="button" data-go><svg aria-hidden="true"><use href="#i-close"/></svg>Unsubscribe</button>
+    <p class="signup__status" role="status" data-status></p>
+    <p data-when="ok" hidden>Changed your mind? <a href="newsletter/">Sign up again</a>.</p>
+    <p data-when="retry" hidden>You can also email us at <a href="mailto:{{email}}">{{email}}</a> and we’ll take you off the list.</p>
+    <noscript><p>Turn on JavaScript to unsubscribe, or email us at <a href="mailto:{{email}}">{{email}}</a>.</p></noscript>
+  </section>
+</div>

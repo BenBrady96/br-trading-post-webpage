@@ -1,0 +1,15 @@
+<form class="signup" data-newsletter data-sitekey="{{sitekey}}" novalidate>
+  <label class="signup__label" for="{{id}}-email">Email address</label>
+  <div class="signup__controls">
+    <input class="signup__input" id="{{id}}-email" name="email" type="email" autocomplete="email" inputmode="email" spellcheck="false" maxlength="254" required aria-describedby="{{id}}-note">
+    <button class="btn btn--primary signup__submit" type="submit"><svg aria-hidden="true"><use href="#i-mail"/></svg>Sign up</button>
+  </div>
+  <div hidden>
+    <label for="{{id}}-website">Leave this empty</label>
+    <input id="{{id}}-website" name="website" type="text" tabindex="-1" autocomplete="off">
+  </div>
+  <div class="signup__check" data-turnstile></div>
+  <p class="signup__status" role="status" data-status></p>
+  <p class="signup__note" id="{{id}}-note">Every Monday: new stock and promotions. Unsubscribe any time. <a href="privacy/#newsletter">How we use your email</a>.</p>
+  <noscript><p class="signup__note">Turn on JavaScript to sign up, or email us at <a href="mailto:{{email}}">{{email}}</a>.</p></noscript>
+</form>

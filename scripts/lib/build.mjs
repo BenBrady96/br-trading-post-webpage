@@ -63,6 +63,9 @@ export async function build({ siteUrl, apiUrl, data, out = DIST, now = new Date(
     await pages.privacyPage(ctx),
     await pages.termsPage(ctx),
     await pages.accessibilityPage(ctx),
+    await pages.newsletterPage(ctx),
+    await pages.newsletterConfirmPage(ctx),
+    await pages.newsletterUnsubscribePage(ctx),
     await pages.notFoundPage(ctx),
   ];
 

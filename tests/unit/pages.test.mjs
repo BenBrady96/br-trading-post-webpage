@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { itemDetails, itemSummary } from '../../public/js/core/item.js';
-import { analyticsOn, cardHtml, crumbsHtml, csp, itemPage, promoHtml, sitemapXml } from '../../scripts/lib/pages.mjs';
+import { SITE, isSet } from '../../config/site.mjs';
+import { TURNSTILE_TEST_KEY, analyticsOn, cardHtml, crumbsHtml, csp, homePage, itemPage, newsletterConfirmPage, newsletterPage, newsletterUnsubscribePage, promoHtml, sitemapXml, turnstileKey } from '../../scripts/lib/pages.mjs';
 
 const item = {
   id: 'ebay-205512340001',
@@ -81,8 +82,51 @@ test('the CSP is strict and only adds https upgrades on https sites', () => {
 test('analytics only loads on the live https site, never in local previews', () => {
   assert.ok(analyticsOn('https://brtradingpost.co.uk/'));
   assert.ok(!analyticsOn('http://localhost:8080/'));
-  assert.match(csp({ siteUrl: 'https://brtradingpost.co.uk/', apiUrl: 'https://api.brtradingpost.co.uk/' }), /script-src 'self' 'inline-speculation-rules' https:\/\/static\.cloudflareinsights\.com;.*connect-src 'self' https:\/\/api\.brtradingpost\.co\.uk https:\/\/cloudflareinsights\.com;/);
+  assert.match(csp({ siteUrl: 'https://brtradingpost.co.uk/', apiUrl: 'https://api.brtradingpost.co.uk/' }), /script-src 'self' 'inline-speculation-rules' https:\/\/challenges\.cloudflare\.com https:\/\/static\.cloudflareinsights\.com;.*connect-src 'self' https:\/\/api\.brtradingpost\.co\.uk https:\/\/cloudflareinsights\.com;/);
   assert.ok(!csp({ siteUrl: 'http://localhost:8080/', apiUrl: 'http://localhost:8080/__api/' }).includes('cloudflareinsights'));
+});
+
+test('Turnstile is allowed as a script and a frame, and nothing else from Cloudflare’s challenge site', () => {
+  const policy = csp({ siteUrl: 'http://localhost:8080/', apiUrl: 'http://localhost:8080/__api/' });
+  assert.match(policy, /script-src 'self' 'inline-speculation-rules' https:\/\/challenges\.cloudflare\.com;/);
+  assert.match(policy, /frame-src https:\/\/challenges\.cloudflare\.com;/);
+  assert.match(policy, /form-action 'none'/);
+  assert.equal(policy.match(/challenges\.cloudflare\.com/g).length, 2);
+});
+
+test('local builds use Turnstile’s test key, and the live site only uses a real one', () => {
+  assert.equal(turnstileKey('http://localhost:8080/'), TURNSTILE_TEST_KEY);
+  assert.equal(turnstileKey('https://brtradingpost.co.uk/'), isSet(SITE.turnstileSiteKey) ? SITE.turnstileSiteKey : TURNSTILE_TEST_KEY);
+});
+
+const ctx = { siteUrl: 'https://brtradingpost.co.uk/', apiUrl: 'https://api.brtradingpost.co.uk/', now: new Date('2026-10-24T00:00:00Z'), items: [], promotions: [] };
+
+test('the newsletter page has a labelled sign-up form with a hidden honeypot', async () => {
+  const page = await newsletterPage(ctx);
+  assert.equal(page.indexable, true);
+  assert.equal(page.script, 'newsletter');
+  assert.match(page.body, /<form class="signup" data-newsletter data-sitekey="[^"]+" novalidate>/);
+  assert.match(page.body, /<label class="signup__label" for="signup-email">Email address<\/label>/);
+  assert.match(page.body, /<input class="signup__input" id="signup-email" name="email" type="email" autocomplete="email"/);
+  assert.match(page.body, /<div hidden>\s*<label for="signup-website">/);
+  assert.match(page.body, /href="privacy\/#newsletter"/);
+  assert.doesNotMatch(page.body, /action=/);
+});
+
+test('the confirm and unsubscribe pages are kept out of search engines', async () => {
+  for (const page of [await newsletterConfirmPage(ctx), await newsletterUnsubscribePage(ctx)]) {
+    assert.equal(page.indexable, false);
+    assert.equal(page.robots, 'noindex, follow');
+    assert.equal(page.script, 'newsletter');
+    assert.match(page.body, /data-token-action="(confirm|unsubscribe)"/);
+    assert.match(page.body, /<button class="btn btn--primary btn--lg" type="button" data-go>/);
+  }
+});
+
+test('the home page has its own sign-up form', async () => {
+  const page = await homePage(ctx);
+  assert.match(page.body, /id="home-signup-email"/);
+  assert.match(page.body, /New stock in your inbox every Monday/);
 });
 
 test('sitemaps list pages, dates and images', () => {

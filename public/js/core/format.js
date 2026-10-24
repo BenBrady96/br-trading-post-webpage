@@ -39,17 +39,21 @@ export function clockTime(value) {
   return m === 0 ? `${twelve}${suffix}` : `${twelve}:${String(m).padStart(2, '0')}${suffix}`;
 }
 
-export function endsText(value, now = new Date(), { relative = true } = {}) {
-  const end = toDate(value);
-  const at = `at ${clockTime(end)}`;
+function whenText(label, value, now, relative) {
+  const when = toDate(value);
+  const at = `at ${clockTime(when)}`;
   if (relative) {
-    const day = londonDay(end);
-    if (day === londonDay(now)) return `Ends today ${at}`;
-    if (day === londonDay(new Date(toDate(now).getTime() + 86400000))) return `Ends tomorrow ${at}`;
+    const day = londonDay(when);
+    if (day === londonDay(now)) return `${label} today ${at}`;
+    if (day === londonDay(new Date(toDate(now).getTime() + 86400000))) return `${label} tomorrow ${at}`;
   }
-  const { weekday, day: date, month } = parts(end);
-  return `Ends ${weekday} ${Number(date)} ${month} ${at}`;
+  const { weekday, day: date, month } = parts(when);
+  return `${label} ${weekday} ${Number(date)} ${month} ${at}`;
 }
+
+export const endsText = (value, now = new Date(), { relative = true } = {}) => whenText('Ends', value, now, relative);
+
+export const startsText = (value, now = new Date(), { relative = true } = {}) => whenText('Starts', value, now, relative);
 
 export function countdown(value, now = new Date()) {
   const ms = toDate(value).getTime() - toDate(now).getTime();

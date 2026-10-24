@@ -1,12 +1,12 @@
 <div class="wrap page-head">
 {{{crumbs}}}
   <h1 class="page-title">Privacy &amp; cookies</h1>
-  <p class="doc__updated">Last updated: 22 October 2026</p>
+  <p class="doc__updated">Last updated: 24 October 2026</p>
 </div>
 
 <div class="wrap">
   <article class="prose doc">
-    <p class="doc__lead">The short version: this website doesn’t use cookies, doesn’t track you across other sites and doesn’t ask you for any personal information. If you email us or buy from us, we use your details only to help you and to fulfil your order.</p>
+    <p class="doc__lead">The short version: this website doesn’t use cookies and doesn’t track you across other sites. The only personal information it asks for is your email address, if you sign up to our newsletter. If you sign up, email us or buy from us, we use your details only for that: to send the newsletter, to help you, or to fulfil your order.</p>
 
     <h2>Who we are</h2>
     <p>{{controller}} We decide how the personal information described here is used, which makes us its controller under UK data protection law. You can contact us about privacy at <a href="mailto:{{email}}">{{email}}</a>.</p>
@@ -21,6 +21,16 @@
     <h2>When you email us</h2>
     <p>We receive your email address, your name if you include it, and whatever you write. We use it to reply and to deal with your question, on the basis of our legitimate interests in running the shop, or to take steps you’ve asked for before an order. Emails to our address are forwarded by Cloudflare to our Google mailbox. We keep messages for as long as we need them to help you, and no longer than two years unless they relate to an order.</p>
 
+    <h2 id="newsletter">When you sign up to our newsletter</h2>
+    <p>If you sign up to our weekly email, we keep your email address, when you signed up and confirmed, the wording you agreed to, and a random code that makes the confirm and unsubscribe links work. We use them only to send you the newsletter, on the basis of your consent.</p>
+    <ul>
+      <li><b>Confirming it’s you.</b> We email you a link to confirm before sending you anything else, so nobody can sign you up without your say. If you don’t confirm within 7 days, we delete your address.</li>
+      <li><b>Checking you’re a person.</b> When you start using the sign-up form, it loads Cloudflare Turnstile, which checks the form is being used by a person rather than a bot. Cloudflare receives your IP address and browser details for that check. We use it to stop people abusing the form, on the basis of our legitimate interests.</li>
+      <li><b>Where it’s kept.</b> Your address passes through our shop data service on Cloudflare, which doesn’t store or log it, to a private Google Sheet in our Google account. The newsletter is sent from our Gmail account.</li>
+      <li><b>No tracking.</b> Our emails don’t contain tracking pixels or tracked links, so we don’t know whether you open them or what you click.</li>
+      <li><b>Unsubscribing.</b> Use the link at the bottom of any newsletter, the Unsubscribe button in your email app, or email us. We delete your address straight away.</li>
+    </ul>
+
     <h2>When you buy from us</h2>
     <p>Orders are placed on eBay, which shares with us the details we need to send your order, such as your name, delivery address and what you bought. We use them to pack and post your order, deal with returns and keep the records the law requires, which for tax records is about six years. eBay’s order emails also pass through our shop data service on Cloudflare, which reads only the item number so it can mark the item as sold; it doesn’t keep the email or anything about you. eBay’s own privacy policy covers how it handles your information.</p>
 
@@ -31,6 +41,7 @@
       <li>a copy of the site’s files, kept by a service worker in cache storage, so pages load quickly and work if your connection drops</li>
     </ul>
     <p>You can clear both at any time in your browser’s settings.</p>
+    <p>If you use the newsletter form, Cloudflare Turnstile runs in a frame from Cloudflare and may store what it needs for its check there. It only loads once you start using the form, and it’s strictly necessary for the sign-up you asked for.</p>
 
     <h2>Links to other websites</h2>
     <p>Buttons for eBay, TikTok, Instagram and Facebook are plain links. We don’t embed their widgets or tracking pixels, so they learn nothing about your visit unless you follow a link. Once you’re on their website, their privacy policy applies.</p>
@@ -39,8 +50,8 @@
     <p>We don’t sell your information or use it for advertising. We use these services to run the shop, and they process information on our behalf:</p>
     <ul>
       <li>GitHub (website hosting)</li>
-      <li>Cloudflare (domain, shop data service, email forwarding and visitor statistics)</li>
-      <li>Google (email)</li>
+      <li>Cloudflare (domain, shop data service, email forwarding, visitor statistics and the newsletter form’s bot check)</li>
+      <li>Google (email, and keeping and sending the newsletter list)</li>
       <li>eBay (the marketplace where orders are placed)</li>
     </ul>
     <p>Some of these companies process information outside the UK. When they do, they use the safeguards UK law requires, such as UK adequacy regulations or the International Data Transfer Addendum.</p>
