@@ -62,6 +62,8 @@ function humanCheck(form) {
         token = '';
       },
       'error-callback': () => settle(''),
+      'before-interactive-callback': () => box.classList.add('is-visible'),
+      'after-interactive-callback': () => box.classList.remove('is-visible'),
     });
   };
   return {

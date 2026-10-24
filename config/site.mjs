@@ -48,8 +48,8 @@ function basedIn() {
   return area ? `based near ${area}` : 'based in the UK';
 }
 
-export function controllerText() {
-  if (isSet(SITE.owner)) return `BR Trading Post is a trading name of ${SITE.owner}, a sole trader ${basedIn()}.`;
+export function controllerText({ named = true } = {}) {
+  if (named && isSet(SITE.owner)) return `BR Trading Post is a trading name of ${SITE.owner}, a sole trader ${basedIn()}.`;
   return `BR Trading Post is a sole trader business ${basedIn()}.`;
 }
 

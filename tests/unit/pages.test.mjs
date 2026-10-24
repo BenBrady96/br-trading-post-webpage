@@ -126,7 +126,8 @@ test('the confirm and unsubscribe pages are kept out of search engines', async (
 test('the home page has its own sign-up form', async () => {
   const page = await homePage(ctx);
   assert.match(page.body, /id="home-signup-email"/);
-  assert.match(page.body, /New stock in your inbox every Monday/);
+  assert.match(page.body, /Never miss an offer/);
+  assert.doesNotMatch(page.body, /Monday/);
 });
 
 test('sitemaps list pages, dates and images', () => {

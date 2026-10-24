@@ -551,7 +551,7 @@ export const termsPage = (ctx) => docPage(ctx, { id: 'terms', path: 'terms/', fi
 export async function newsletterPage(ctx) {
   const page = await docPage(ctx, {
     id: 'newsletter', path: 'newsletter/', file: 'newsletter.html', title: 'Newsletter', crumb: 'Newsletter', active: 'more',
-    description: 'Get new trading cards, custom binders and promotions from BR Trading Post in your inbox every Monday. Free, and you can unsubscribe at any time.',
+    description: 'Sign up to the BR Trading Post newsletter to be alerted to our special promotions, offers and more. Free, and you can unsubscribe at any time.',
     values: { form: await newsletterForm(ctx, 'signup') },
   });
   return { ...page, script: 'newsletter' };
@@ -564,7 +564,7 @@ async function tokenPage(ctx, options) {
 
 export const newsletterConfirmPage = (ctx) => tokenPage(ctx, {
   id: 'newsletter-confirm', path: 'newsletter/confirm/', file: 'newsletter-confirm.html', title: 'Confirm Your Sign-up', crumb: 'Confirm your sign-up',
-  description: 'Confirm your sign-up to the BR Trading Post newsletter to get our new stock and promotions every Monday.',
+  description: 'Confirm your sign-up to the BR Trading Post newsletter to be alerted to our special promotions and offers.',
 });
 
 export const newsletterUnsubscribePage = (ctx) => tokenPage(ctx, {

@@ -8,7 +8,7 @@ const TOKEN = /^[A-Za-z0-9][A-Za-z0-9_-]{42}$/;
 
 const MESSAGES = {
   confirm: {
-    ok: 'You’re subscribed. Look out for our next email on a Monday.',
+    ok: 'You’re subscribed. We’ll let you know about our special promotions and offers.',
     expired: 'This link has expired or has been replaced by a newer one. Please sign up again.',
     'bad-token': 'This link isn’t complete. Please open it straight from our email.',
     'rate-limit': 'That’s a lot of tries. Please wait a minute and try again.',
