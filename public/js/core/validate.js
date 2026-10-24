@@ -59,7 +59,7 @@ export function cleanItem(raw, { allowHttp = false, categories = null, fallback 
     featured: raw.featured === true,
     listedAt: iso(raw.listedAt),
     addedAt: iso(raw.addedAt) || iso(raw.listedAt),
-    soldAt: raw.status === 'sold' ? iso(raw.soldAt) : null,
+    soldAt: iso(raw.soldAt),
     updatedAt: iso(raw.updatedAt) || iso(raw.listedAt),
   };
 }

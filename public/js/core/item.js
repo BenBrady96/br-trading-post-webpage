@@ -20,7 +20,7 @@ export function itemDetails(item, categoryName) {
   rows.push(['Category', categoryName]);
   for (const [k, v] of item.specifics || []) if (k && v && rows.length < 14 && !/^condition$/i.test(k)) rows.push([k, v]);
   if (item.listedAt) rows.push(['Listed', longDate(item.listedAt)]);
-  if (isSold(item) && item.soldAt) rows.push(['Sold', longDate(item.soldAt)]);
+  if (item.soldAt) rows.push(['Last sold', longDate(item.soldAt)]);
   return rows;
 }
 

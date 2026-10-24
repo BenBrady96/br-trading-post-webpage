@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { itemSummary } from '../../public/js/core/item.js';
+import { itemDetails, itemSummary } from '../../public/js/core/item.js';
 import { analyticsOn, cardHtml, crumbsHtml, csp, itemPage, promoHtml, sitemapXml } from '../../scripts/lib/pages.mjs';
 
 const item = {
@@ -34,6 +34,12 @@ test('cards escape titles and show the Sold out state without a price', () => {
 test('item summaries read naturally, and leave out the price once sold', () => {
   assert.equal(itemSummary(item), 'Used condition. This item has sold. BR Trading Post is a UK Pokémon card shop, and we list new stock regularly.');
   assert.equal(itemSummary({ ...item, status: 'available', condition: '', category: 'custom-binders' }), '£89.99 from BR Trading Post, a UK custom binder shop, on eBay.');
+});
+
+test('item details say when it last sold, so a restocked item doesn\'t look sold', () => {
+  assert.deepEqual(itemDetails(item, 'Pokémon').at(-1), ['Last sold', '10 October 2026']);
+  assert.deepEqual(itemDetails({ ...item, status: 'available' }, 'Pokémon').at(-1), ['Last sold', '10 October 2026']);
+  assert.ok(!itemDetails({ ...item, status: 'available', soldAt: null }, 'Pokémon').some(([k]) => /sold/i.test(k)));
 });
 
 test('a sold item page shows no price anywhere', async () => {

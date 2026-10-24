@@ -23,6 +23,7 @@ test('a good item is kept and tidied', () => {
   assert.equal(item.category, 'pokemon');
   assert.equal(item.listedAt, '2026-10-01T00:00:00.000Z');
   assert.equal(item.soldAt, null);
+  assert.equal(cleanItem({ ...good, soldAt: '2026-10-23T14:33:18Z' }, { categories }).soldAt, '2026-10-23T14:33:18.000Z', 'a restocked item keeps when it last sold');
 });
 
 test('items with bad ids, slugs, prices or links are rejected', () => {
