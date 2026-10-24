@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { analyticsOn, cardHtml, crumbsHtml, csp, itemSummary, promoHtml, sitemapXml } from '../../scripts/lib/pages.mjs';
+import { itemSummary } from '../../public/js/core/item.js';
+import { analyticsOn, cardHtml, crumbsHtml, csp, itemPage, promoHtml, sitemapXml } from '../../scripts/lib/pages.mjs';
 
 const item = {
   id: 'ebay-205512340001',
@@ -18,19 +19,33 @@ const item = {
   soldAt: '2026-10-10T00:00:00.000Z',
 };
 
-test('cards escape titles and show the Sold out state', () => {
+test('cards escape titles and show the Sold out state without a price', () => {
   const html = cardHtml(item);
   assert.ok(!html.includes('<script>'));
   assert.match(html, /card--sold/);
   assert.match(html, /Sold out/);
-  assert.match(html, /£89\.99/);
+  assert.match(html, /<span class="card__price" hidden><\/span>/);
+  assert.doesNotMatch(html, /89\.99/);
   assert.match(html, /loading="lazy"/);
   assert.match(html, /width="500" height="500"/);
+  assert.match(cardHtml({ ...item, status: 'available' }), /<span class="card__price">£89\.99<\/span>/);
 });
 
-test('item summaries read naturally', () => {
-  assert.equal(itemSummary(item), 'Used condition. This item sold for £89.99 on eBay. BR Trading Post is a UK Pokémon card shop, and we list new stock regularly.');
+test('item summaries read naturally, and leave out the price once sold', () => {
+  assert.equal(itemSummary(item), 'Used condition. This item has sold. BR Trading Post is a UK Pokémon card shop, and we list new stock regularly.');
   assert.equal(itemSummary({ ...item, status: 'available', condition: '', category: 'custom-binders' }), '£89.99 from BR Trading Post, a UK custom binder shop, on eBay.');
+});
+
+test('a sold item page shows no price anywhere', async () => {
+  const ctx = { siteUrl: 'https://brtradingpost.co.uk/', apiUrl: 'https://api.example/', now: new Date('2026-10-24T00:00:00Z'), items: [item], promotions: [] };
+  const sold = await itemPage(ctx, item);
+  assert.doesNotMatch(JSON.stringify(sold), /89\.99/);
+  assert.match(sold.body, /<p class="item__price" data-price hidden><\/p>/);
+  assert.equal(sold.ogTitle, 'Charizard <script>alert(1)</script> (sold)');
+  assert.ok(!sold.jsonLd['@graph'].some((node) => node['@type'] === 'Product'));
+  const available = await itemPage(ctx, { ...item, status: 'available', soldAt: null });
+  assert.match(available.body, /<p class="item__price" data-price>£89\.99<\/p>/);
+  assert.equal(available.jsonLd['@graph'].find((node) => node['@type'] === 'Product').offers.price, '89.99');
 });
 
 test('promotions show a static end date and escape text', () => {

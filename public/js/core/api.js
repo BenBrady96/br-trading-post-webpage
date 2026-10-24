@@ -4,8 +4,6 @@ const base = () => document.body.dataset.api;
 const categories = () => new Set((document.body.dataset.categories || '').split(/\s+/).filter(Boolean));
 const allowHttp = () => base()?.startsWith('http:') ?? false;
 
-export const builtAt = () => Date.parse(document.body.dataset.built || '') || 0;
-
 export async function getJson(path, { timeout = 6000 } = {}) {
   const apiBase = base();
   if (!apiBase) return null;

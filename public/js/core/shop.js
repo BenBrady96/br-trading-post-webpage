@@ -26,7 +26,7 @@ export function sortItems(items, sort = 'newest') {
     const sa = isSold(a);
     const sb = isSold(b);
     if (sa !== sb) return sa ? 1 : -1;
-    return sa && sort === 'newest' ? bySold(a, b) : within(a, b);
+    return sa ? bySold(a, b) : within(a, b);
   });
 }
 

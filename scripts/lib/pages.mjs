@@ -1,7 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { CATEGORIES, SITE, isSet } from '../../config/site.mjs';
-import { endsText, formatPrice, isLive, longDate } from '../../public/js/core/format.js';
+import { endsText, formatPrice, isLive } from '../../public/js/core/format.js';
+import { PROTECTION, itemDetails, itemSummary, paragraphs } from '../../public/js/core/item.js';
 import { SOURCES, counts, homeShelves, isSold, sortItems } from '../../public/js/core/shop.js';
 import { promotionKey } from '../../public/js/core/validate.js';
 import { escapeHtml as esc, fill, jsonScript, prefixUrls } from './html.mjs';
@@ -18,8 +19,6 @@ export const clearTemplates = () => templates.clear();
 export const CATEGORY = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
 export const categoryName = (id) => CATEGORY[id]?.name ?? CATEGORY['other-tcg'].name;
 
-const NOUNS = { pokemon: 'Pokémon card', 'one-piece': 'One Piece card', lorcana: 'Disney Lorcana card', 'yu-gi-oh': 'Yu-Gi-Oh! card', 'other-tcg': 'trading card', 'custom-binders': 'custom binder' };
-const PROTECTION = { ebay: 'Price includes eBay’s Buyer Protection, with secure checkout on eBay' };
 const EXT = 'target="_blank" rel="noopener noreferrer" aria-describedby="new-tab"';
 const icon = (id, cls) => `<svg${cls ? ` class="${cls}"` : ''} aria-hidden="true"><use href="#${id}"/></svg>`;
 
@@ -160,13 +159,13 @@ export function cardHtml(item, { level = 3, eager = false } = {}) {
   const media = img
     ? `<img src="${esc(img.small)}"${set ? ` srcset="${set}" sizes="(min-width: 1280px) 300px, (min-width: 900px) 23vw, 46vw"` : ''} width="500" height="500" alt="${esc(item.title)}"${eager ? '' : ' loading="lazy"'} decoding="async">`
     : `<span class="card__placeholder">${icon('i-cards')}</span>`;
-  return `<li class="card${sold ? ' card--sold' : ''}" data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-status="${sold ? 'sold' : 'available'}" data-category="${esc(item.category)}" data-price="${Number(item.price) || 0}" data-listed="${esc(item.listedAt || '')}" data-sold="${esc(item.soldAt || '')}">
+  return `<li class="card${sold ? ' card--sold' : ''}" data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-status="${sold ? 'sold' : 'available'}" data-category="${esc(item.category)}" data-price="${sold ? '' : Number(item.price) || 0}" data-listed="${esc(item.listedAt || '')}" data-sold="${esc(item.soldAt || '')}">
   <a class="card__link" href="item/${esc(item.slug)}/">
     <div class="card__media">${media}<span class="sold-band" aria-hidden="true">Sold out</span></div>
     <div class="card__body">
       <p class="card__source">${icon(`i-${item.source}`)}<span>${SOURCES[item.source] || ''}</span></p>
       <h${level} class="card__title">${esc(item.title)}</h${level}>
-      <p class="card__foot"><span class="card__price">${esc(formatPrice(item.price, item.currency))}</span><span class="card__status">${sold ? 'Sold out' : 'In stock'}</span></p>
+      <p class="card__foot"><span class="card__price"${sold ? ' hidden>' : `>${esc(formatPrice(item.price, item.currency))}`}</span><span class="card__status">${sold ? 'Sold out' : 'In stock'}</span></p>
     </div>
   </a>
 </li>`;
@@ -256,12 +255,7 @@ function heroMarkets() {
 }
 
 function specificsHtml(item) {
-  const rows = [];
-  if (item.condition) rows.push(['Condition', item.condition]);
-  rows.push(['Category', categoryName(item.category)]);
-  for (const [k, v] of item.specifics || []) if (k && v && rows.length < 14 && !/^condition$/i.test(k)) rows.push([k, v]);
-  if (item.listedAt) rows.push(['Listed', longDate(item.listedAt)]);
-  if (isSold(item) && item.soldAt) rows.push(['Sold', longDate(item.soldAt)]);
+  const rows = itemDetails(item, categoryName(item.category));
   return `<section class="item__section" aria-labelledby="details-title">
   <h2 class="item__heading" id="details-title">Details</h2>
   <dl class="specs">
@@ -271,22 +265,12 @@ ${rows.map(([k, v]) => `    <div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).jo
 }
 
 function descriptionHtml(item) {
-  const paras = String(item.description || '').split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  const paras = paragraphs(item.description);
   if (!paras.length) return '';
   return `<section class="item__section" aria-labelledby="desc-title">
   <h2 class="item__heading" id="desc-title">Description</h2>
   <div class="prose prose--small">${paras.map((p) => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('')}</div>
 </section>`;
-}
-
-export function itemSummary(item) {
-  const noun = NOUNS[item.category] || 'trading card';
-  const where = SOURCES[item.source] || 'eBay';
-  const price = formatPrice(item.price, item.currency);
-  const condition = item.condition ? `${item.condition} condition. ` : '';
-  return isSold(item)
-    ? `${condition}This item sold for ${price} on ${where}. BR Trading Post is a UK ${noun} shop, and we list new stock regularly.`
-    : `${condition}${price} from BR Trading Post, a UK ${noun} shop, on ${where}.`;
 }
 
 function galleryHtml(item) {
@@ -343,7 +327,6 @@ export async function renderPage(ctx, page) {
     ogExtra: page.ogExtra || '',
     apiOrigin: new URL(apiUrl).origin,
     apiUrl,
-    built: ctx.now.toISOString(),
     categoryIds: CATEGORIES.map((c) => c.id).join(' '),
     preload: page.preload || '',
     script: page.script || 'page',
@@ -482,7 +465,8 @@ export async function itemPage(ctx, item) {
     category: category.id,
     categoryName: category.name,
     title: item.title,
-    price: formatPrice(item.price, item.currency),
+    priceHidden: sold ? ' hidden' : '',
+    price: sold ? '' : formatPrice(item.price, item.currency),
     statusText: sold ? 'Sold out' : `In stock on ${sourceName}`,
     summary,
     buy,
@@ -497,7 +481,7 @@ export async function itemPage(ctx, item) {
     id: 'item',
     path,
     title: item.title,
-    ogTitle: `${item.title} | ${formatPrice(item.price, item.currency)}${sold ? ' (sold)' : ''}`,
+    ogTitle: sold ? `${item.title} (sold)` : `${item.title} | ${formatPrice(item.price, item.currency)}`,
     description: `${item.title}. ${summary}`,
     script: 'item',
     active: 'shop',
@@ -505,15 +489,15 @@ export async function itemPage(ctx, item) {
     ogType: 'product',
     ogImage: image ? image.large || image.small : undefined,
     ogImageAlt: item.title,
-    ogExtra: [
+    ogExtra: (sold ? ['  <meta property="product:availability" content="out of stock">'] : [
       `  <meta property="product:price:amount" content="${priceValue}">`,
       `  <meta property="product:price:currency" content="${esc(item.currency || 'GBP')}">`,
-      `  <meta property="product:availability" content="${sold ? 'out of stock' : 'in stock'}">`,
-    ].join('\n'),
+      '  <meta property="product:availability" content="in stock">',
+    ]).join('\n'),
     indexable: true,
     lastmod: item.updatedAt,
     images: (item.images || []).slice(0, 1).map((img) => img.large || img.small),
-    jsonLd: seo.graph(...common(ctx), seo.webPage(siteUrl, url, { type: 'ItemPage', name: item.title, description: summary, trail, image: image ? image.large || image.small : undefined, modified: item.updatedAt }), seo.breadcrumbs(siteUrl, url, trail), seo.product(siteUrl, url, { ...item, summary }, { categoryName: category.name })),
+    jsonLd: seo.graph(...common(ctx), seo.webPage(siteUrl, url, { type: 'ItemPage', name: item.title, description: summary, trail, image: image ? image.large || image.small : undefined, modified: item.updatedAt }), seo.breadcrumbs(siteUrl, url, trail), sold ? null : seo.product(siteUrl, url, { ...item, summary }, { categoryName: category.name })),
   };
 }
 
@@ -583,11 +567,11 @@ export async function notFoundPage(ctx) {
     path: '404.html',
     title: 'Page Not Found',
     description: 'This page has moved or doesn’t exist. Visit the BR Trading Post shop for trading cards and custom painted binders.',
-    script: 'page',
+    script: 'notfound',
     active: '',
     robots: 'noindex, follow',
     indexable: false,
-    body: await template('404.html'),
+    body: fill(await template('404.html'), { categoryNames: JSON.stringify(Object.fromEntries(CATEGORIES.map((c) => [c.id, c.name]))) }),
     jsonLd: seo.graph(seo.website(ctx.siteUrl)),
   };
 }

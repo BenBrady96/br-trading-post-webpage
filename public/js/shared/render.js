@@ -1,16 +1,9 @@
-import { builtAt } from '../core/api.js';
 import { endsText, formatPrice } from '../core/format.js';
-import { SOURCES, isSold } from '../core/shop.js';
+import { SOURCES, isSold, itemPath } from '../core/shop.js';
 import { el, icon, rootUrl } from './dom.js';
 
 const EXT = { target: '_blank', rel: 'noopener noreferrer', 'aria-describedby': 'new-tab' };
 const LINK_LABELS = { tiktok: 'TikTok', instagram: 'Instagram', facebook: 'Facebook', ebay: 'eBay', website: 'Website' };
-
-const isBuilt = (item) => (Date.parse(item.addedAt || '') || 0) <= builtAt();
-
-export function itemHref(item) {
-  return isBuilt(item) ? new URL(`item/${item.slug}/`, rootUrl()).href : item.url;
-}
 
 function imageNode(img, alt, sizes) {
   const attrs = { src: img.small, width: '500', height: '500', alt, loading: 'lazy', decoding: 'async' };
@@ -24,14 +17,13 @@ export function cardNode(item, { level = 3 } = {}) {
   const media = el('div', { class: 'card__media' },
     img ? imageNode(img, item.title, '(min-width: 1280px) 300px, (min-width: 900px) 23vw, 46vw') : el('span', { class: 'card__placeholder' }, icon('i-cards')),
     el('span', { class: 'sold-band', 'aria-hidden': 'true', text: 'Sold out' }));
-  const external = !isBuilt(item);
-  const link = el('a', { class: 'card__link', href: itemHref(item), ...(external ? EXT : {}) },
+  const link = el('a', { class: 'card__link', href: new URL(itemPath(item), rootUrl()).href },
     media,
     el('div', { class: 'card__body' },
       el('p', { class: 'card__source' }, icon(`i-${item.source}`), el('span', { text: SOURCES[item.source] || '' })),
       el(`h${level}`, { class: 'card__title', text: item.title }),
       el('p', { class: 'card__foot' },
-        el('span', { class: 'card__price', text: formatPrice(item.price, item.currency) }),
+        el('span', { class: 'card__price', hidden: sold, text: sold ? '' : formatPrice(item.price, item.currency) }),
         el('span', { class: 'card__status', text: sold ? 'Sold out' : 'In stock' }))));
   return el('li', {
     class: `card${sold ? ' card--sold' : ''}`,
@@ -39,7 +31,7 @@ export function cardNode(item, { level = 3 } = {}) {
     'data-source': item.source,
     'data-status': sold ? 'sold' : 'available',
     'data-category': item.category,
-    'data-price': String(Number(item.price) || 0),
+    'data-price': sold ? '' : String(Number(item.price) || 0),
     'data-listed': item.listedAt || '',
     'data-sold': item.soldAt || '',
   }, link);
@@ -49,12 +41,15 @@ export function updateCard(node, item) {
   const sold = isSold(item);
   node.classList.toggle('card--sold', sold);
   node.dataset.status = sold ? 'sold' : 'available';
-  node.dataset.price = String(Number(item.price) || 0);
+  node.dataset.price = sold ? '' : String(Number(item.price) || 0);
   node.dataset.sold = item.soldAt || '';
   const price = node.querySelector('.card__price');
   const status = node.querySelector('.card__status');
   const title = node.querySelector('.card__title');
-  if (price) price.textContent = formatPrice(item.price, item.currency);
+  if (price) {
+    price.textContent = sold ? '' : formatPrice(item.price, item.currency);
+    price.hidden = sold;
+  }
   if (status) status.textContent = sold ? 'Sold out' : 'In stock';
   if (title && title.textContent !== item.title) title.textContent = item.title;
 }

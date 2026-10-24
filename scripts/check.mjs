@@ -86,10 +86,13 @@ for (const file of htmlFiles) {
   check(description, `${label}: has a meta description`);
   check(description && description.length <= DESCRIPTION_MAX + 5, `${label}: description is ${description?.length} characters (max ${DESCRIPTION_MAX})`);
   if (!noindex) {
-    check(!titles.has(title), `${label}: title is unique (also on ${titles.get(title)})`);
-    check(!descriptions.has(description), `${label}: description is unique (also on ${descriptions.get(description)})`);
-    titles.set(title, label);
-    descriptions.set(description, label);
+    for (const [seen, value, what] of [[titles, title, 'title'], [descriptions, description, 'description']]) {
+      const clash = seen.get(value);
+      // Item titles come from listings, and two listings can share one, so that mustn't stop a deploy.
+      if (clash && (label.startsWith('item/') || clash.startsWith('item/'))) warnings.push(`${label}: ${what} is also on ${clash}`);
+      else check(!clash, `${label}: ${what} is unique (also on ${clash})`);
+      seen.set(value, label);
+    }
   }
 
   const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1];
@@ -236,7 +239,7 @@ async function moduleGraph(entry, seen = new Set()) {
   }
   return seen;
 }
-for (const entry of ['home', 'shop', 'item', 'promotions', 'page']) {
+for (const entry of ['home', 'shop', 'item', 'notfound', 'promotions', 'page']) {
   const graph = await moduleGraph(`js/pages/${entry}.js`);
   let total = gz(await readFile(join(DIST, 'js', 'shared', 'theme-init.js')));
   for (const file of graph) total += gz(await readFile(join(DIST, file)));

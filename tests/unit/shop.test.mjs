@@ -13,9 +13,9 @@ test('sold items always come after available ones', () => {
   assert.deepEqual(sortItems(items).map((i) => i.id), ['ebay-3', 'ebay-1', 'ebay-4', 'ebay-2']);
 });
 
-test('price sorts keep sold items last', () => {
+test('price sorts keep sold items last, most recently sold first, as their prices are hidden', () => {
   assert.deepEqual(sortItems(items, 'price-asc').map((i) => i.id), ['ebay-1', 'ebay-3', 'ebay-4', 'ebay-2']);
-  assert.deepEqual(sortItems(items, 'price-desc').map((i) => i.id), ['ebay-3', 'ebay-1', 'ebay-2', 'ebay-4']);
+  assert.deepEqual(sortItems(items, 'price-desc').map((i) => i.id), ['ebay-3', 'ebay-1', 'ebay-4', 'ebay-2']);
 });
 
 test('sortItems does not change the original list', () => {
