@@ -125,6 +125,14 @@ export function product(siteUrl, url, item, { categoryName } = {}) {
     seller: { '@id': orgId(siteUrl) },
   };
   if (CONDITIONS[item.conditionId]) offer.itemCondition = CONDITIONS[item.conditionId];
+  if (item.status !== 'sold' && Number(item.wasPrice) > Number(item.price)) {
+    offer.priceSpecification = {
+      '@type': 'UnitPriceSpecification',
+      priceType: 'https://schema.org/StrikethroughPrice',
+      price: Number(item.wasPrice).toFixed(2),
+      priceCurrency: item.currency || 'GBP',
+    };
+  }
   const node = {
     '@type': 'Product',
     '@id': `${url}#product`,

@@ -1,11 +1,10 @@
 import { fetchShop } from '../core/api.js';
-import { formatPrice } from '../core/format.js';
 import { PROTECTION, itemDetails, itemSummary, paragraphs } from '../core/item.js';
 import { SOURCES, categoryPath, isSold, itemPath, sortItems } from '../core/shop.js';
 import { boot } from '../shared/app.js';
 import { el, icon, rootUrl } from '../shared/dom.js';
 import { buyNode, initItem } from '../shared/item.js';
-import { cardNode } from '../shared/render.js';
+import { cardNode, priceNodes } from '../shared/render.js';
 import { reveal } from '../shared/reveal.js';
 
 boot();
@@ -64,7 +63,7 @@ function itemView(item, items) {
         el('span', { class: `badge badge--${item.source}` }, icon(`i-${item.source}`), source),
         el('a', { class: 'badge badge--plain', href: link(categoryPath(category)), text: categoryName })),
       el('h1', { class: 'item__title', text: item.title }),
-      el('p', { class: 'item__price', 'data-price': true, hidden: sold, text: sold ? '' : formatPrice(item.price, item.currency) }),
+      el('p', { class: 'item__price', 'data-price': true, hidden: sold }, ...(sold ? [] : priceNodes(item))),
       el('p', { class: 'item__status', 'data-status-text': true }, el('span', { class: 'dot', 'aria-hidden': 'true' }), el('span', { text: sold ? 'Sold out' : `In stock on ${source}` })),
       el('p', { class: 'item__summary', text: itemSummary(item) }),
       el('div', { class: 'item__buy' }, buyNode(item), el('button', { type: 'button', class: 'btn btn--ghost', 'data-share': true, 'data-share-title': item.title }, icon('i-share'), 'Share')),

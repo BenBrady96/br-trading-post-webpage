@@ -32,6 +32,24 @@ test('cards escape titles and show the Sold out state without a price', () => {
   assert.match(cardHtml({ ...item, status: 'available' }), /<span class="card__price">£89\.99<\/span>/);
 });
 
+const REDUCED = '<s class="price__was"><span class="sr-only">Was </span>£120.00</s><span class="sr-only">, now</span> £89.99 <span class="price__save">Save £30.01</span>';
+
+test('a reduced item shows the old price struck through, the saving, and reads well aloud', async () => {
+  const reduced = { ...item, status: 'available', soldAt: null, wasPrice: 120 };
+  const card = cardHtml(reduced);
+  assert.ok(card.includes(`<span class="card__price">${REDUCED}</span>`));
+  assert.match(card, /data-price="89\.99" data-was="120"/);
+  assert.match(cardHtml({ ...reduced, status: 'sold' }), /data-was="" .*<span class="card__price" hidden><\/span>/s);
+  assert.match(cardHtml({ ...reduced, wasPrice: null }), /data-was="" .*<span class="card__price">£89\.99<\/span>/s);
+  const ctx = { siteUrl: 'https://brtradingpost.co.uk/', apiUrl: 'https://api.example/', now: new Date('2026-10-24T00:00:00Z'), items: [reduced], promotions: [] };
+  const page = await itemPage(ctx, reduced);
+  assert.ok(page.body.includes(`<p class="item__price" data-price>${REDUCED}</p>`));
+  const offers = page.jsonLd['@graph'].find((node) => node['@type'] === 'Product').offers;
+  assert.equal(offers.price, '89.99');
+  assert.equal(offers.priceSpecification.price, '120.00');
+  assert.equal(page.ogTitle, 'Charizard <script>alert(1)</script> | £89.99');
+});
+
 test('item summaries read naturally, and leave out the price once sold', () => {
   assert.equal(itemSummary(item), 'Used condition. This item has sold. BR Trading Post is a UK Pokémon card shop, and we list new stock regularly.');
   assert.equal(itemSummary({ ...item, status: 'available', condition: '', category: 'custom-binders' }), '£89.99 from BR Trading Post, a UK custom binder shop, on eBay.');

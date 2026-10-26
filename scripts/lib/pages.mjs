@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { CATEGORIES, SITE, addressLine, areaLine, controllerText, isSet } from '../../config/site.mjs';
-import { endsText, formatPrice, isLive } from '../../public/js/core/format.js';
+import { endsText, formatPrice, isLive, reduction } from '../../public/js/core/format.js';
 import { PROTECTION, itemDetails, itemSummary, paragraphs } from '../../public/js/core/item.js';
 import { SOURCES, counts, homeShelves, isSold, sortItems } from '../../public/js/core/shop.js';
 import { promotionKey } from '../../public/js/core/validate.js';
@@ -136,6 +136,13 @@ export function crumbsHtml(trail) {
 
 const imgSet = (img) => (img.large && img.large !== img.small ? `${esc(img.small)} 500w, ${esc(img.large)} 1000w` : '');
 
+export function priceHtml(item) {
+  const price = esc(formatPrice(item.price, item.currency));
+  const cut = reduction(item);
+  if (!cut) return price;
+  return `<s class="price__was"><span class="sr-only">Was </span>${esc(cut.was)}</s><span class="sr-only">, now</span> ${price} <span class="price__save">Save ${esc(cut.save)}</span>`;
+}
+
 export function cardHtml(item, { level = 3, eager = false } = {}) {
   const sold = isSold(item);
   const img = item.images?.[0];
@@ -143,13 +150,13 @@ export function cardHtml(item, { level = 3, eager = false } = {}) {
   const media = img
     ? `<img src="${esc(img.small)}"${set ? ` srcset="${set}" sizes="(min-width: 1280px) 300px, (min-width: 900px) 23vw, 46vw"` : ''} width="500" height="500" alt="${esc(item.title)}"${eager ? '' : ' loading="lazy"'} decoding="async">`
     : `<span class="card__placeholder">${icon('i-cards')}</span>`;
-  return `<li class="card${sold ? ' card--sold' : ''}" data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-status="${sold ? 'sold' : 'available'}" data-category="${esc(item.category)}" data-price="${sold ? '' : Number(item.price) || 0}" data-listed="${esc(item.listedAt || '')}" data-sold="${esc(item.soldAt || '')}">
+  return `<li class="card${sold ? ' card--sold' : ''}" data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-status="${sold ? 'sold' : 'available'}" data-category="${esc(item.category)}" data-price="${sold ? '' : Number(item.price) || 0}" data-was="${sold || !reduction(item) ? '' : item.wasPrice}" data-listed="${esc(item.listedAt || '')}" data-sold="${esc(item.soldAt || '')}">
   <a class="card__link" href="item/${esc(item.slug)}/">
     <div class="card__media">${media}<span class="sold-band" aria-hidden="true">Sold out</span></div>
     <div class="card__body">
       <p class="card__source">${icon(`i-${item.source}`)}<span>${SOURCES[item.source] || ''}</span></p>
       <h${level} class="card__title">${esc(item.title)}</h${level}>
-      <p class="card__foot"><span class="card__price"${sold ? ' hidden>' : `>${esc(formatPrice(item.price, item.currency))}`}</span><span class="card__status">${sold ? 'Sold out' : 'In stock'}</span></p>
+      <p class="card__foot"><span class="card__price"${sold ? ' hidden>' : `>${priceHtml(item)}`}</span><span class="card__status">${sold ? 'Sold out' : 'In stock'}</span></p>
     </div>
   </a>
 </li>`;
@@ -455,7 +462,7 @@ export async function itemPage(ctx, item) {
     categoryName: category.name,
     title: item.title,
     priceHidden: sold ? ' hidden' : '',
-    price: sold ? '' : formatPrice(item.price, item.currency),
+    price: sold ? '' : priceHtml(item),
     statusText: sold ? 'Sold out' : `In stock on ${sourceName}`,
     summary,
     buy,

@@ -26,6 +26,12 @@ test('a good item is kept and tidied', () => {
   assert.equal(cleanItem({ ...good, soldAt: '2026-10-23T14:33:18Z' }, { categories }).soldAt, '2026-10-23T14:33:18.000Z', 'a restocked item keeps when it last sold');
 });
 
+test('a was price is only kept when it is a number above the price', () => {
+  assert.equal(cleanItem(good, { categories }).wasPrice, null, 'older API answers have none');
+  assert.equal(cleanItem({ ...good, wasPrice: 120.004 }, { categories }).wasPrice, 120);
+  for (const bad of [90, 89, '120', null, true, Infinity, Number.NaN]) assert.equal(cleanItem({ ...good, wasPrice: bad }, { categories }).wasPrice, null, String(bad));
+});
+
 test('items with bad ids, slugs, prices or links are rejected', () => {
   for (const bad of [
     { id: 'ebay-1;drop' },

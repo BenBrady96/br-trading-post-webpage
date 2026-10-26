@@ -37,12 +37,14 @@ export function cleanItem(raw, { allowHttp = false, categories = null, fallback 
   if (!ID.test(id) || !source || !id.startsWith(`${source}-`) || !SLUG.test(slug) || !title || !Number.isFinite(price) || price < 0 || !url) return null;
   const opts = { allowHttp };
   const category = typeof raw.category === 'string' && SLUG.test(raw.category) && (!categories || categories.has(raw.category)) ? raw.category : fallback;
+  const was = Number.isFinite(raw.wasPrice) ? Math.round(raw.wasPrice * 100) / 100 : null;
   return {
     id,
     source,
     slug,
     title,
     price: Math.round(price * 100) / 100,
+    wasPrice: was !== null && was > Math.round(price * 100) / 100 ? was : null,
     currency: /^[A-Z]{3}$/.test(raw.currency) ? raw.currency : 'GBP',
     status: raw.status === 'sold' ? 'sold' : 'available',
     category,

@@ -1,4 +1,4 @@
-import { endsText, formatPrice } from '../core/format.js';
+import { endsText, formatPrice, reduction } from '../core/format.js';
 import { SOURCES, isSold, itemPath } from '../core/shop.js';
 import { el, icon, rootUrl } from './dom.js';
 
@@ -10,6 +10,20 @@ function imageNode(img, alt, sizes) {
   if (img.large && img.large !== img.small) Object.assign(attrs, { srcset: `${img.small} 500w, ${img.large} 1000w`, sizes });
   return el('img', attrs);
 }
+
+export function priceNodes(item) {
+  const price = formatPrice(item.price, item.currency);
+  const cut = reduction(item);
+  if (!cut) return [price];
+  return [
+    el('s', { class: 'price__was' }, el('span', { class: 'sr-only', text: 'Was ' }), cut.was),
+    el('span', { class: 'sr-only', text: ', now' }),
+    ` ${price} `,
+    el('span', { class: 'price__save', text: `Save ${cut.save}` }),
+  ];
+}
+
+const wasValue = (item, sold) => (sold || !reduction(item) ? '' : String(item.wasPrice));
 
 export function cardNode(item, { level = 3 } = {}) {
   const sold = isSold(item);
@@ -23,7 +37,7 @@ export function cardNode(item, { level = 3 } = {}) {
       el('p', { class: 'card__source' }, icon(`i-${item.source}`), el('span', { text: SOURCES[item.source] || '' })),
       el(`h${level}`, { class: 'card__title', text: item.title }),
       el('p', { class: 'card__foot' },
-        el('span', { class: 'card__price', hidden: sold, text: sold ? '' : formatPrice(item.price, item.currency) }),
+        el('span', { class: 'card__price', hidden: sold }, ...(sold ? [] : priceNodes(item))),
         el('span', { class: 'card__status', text: sold ? 'Sold out' : 'In stock' }))));
   return el('li', {
     class: `card${sold ? ' card--sold' : ''}`,
@@ -32,6 +46,7 @@ export function cardNode(item, { level = 3 } = {}) {
     'data-status': sold ? 'sold' : 'available',
     'data-category': item.category,
     'data-price': sold ? '' : String(Number(item.price) || 0),
+    'data-was': wasValue(item, sold),
     'data-listed': item.listedAt || '',
     'data-sold': item.soldAt || '',
   }, link);
@@ -42,12 +57,13 @@ export function updateCard(node, item) {
   node.classList.toggle('card--sold', sold);
   node.dataset.status = sold ? 'sold' : 'available';
   node.dataset.price = sold ? '' : String(Number(item.price) || 0);
+  node.dataset.was = wasValue(item, sold);
   node.dataset.sold = item.soldAt || '';
   const price = node.querySelector('.card__price');
   const status = node.querySelector('.card__status');
   const title = node.querySelector('.card__title');
   if (price) {
-    price.textContent = sold ? '' : formatPrice(item.price, item.currency);
+    price.replaceChildren(...(sold ? [] : priceNodes(item)));
     price.hidden = sold;
   }
   if (status) status.textContent = sold ? 'Sold out' : 'In stock';
@@ -61,6 +77,7 @@ export function itemFromCard(node) {
     status: node.dataset.status,
     category: node.dataset.category,
     price: Number(node.dataset.price) || 0,
+    wasPrice: Number(node.dataset.was) || null,
     listedAt: node.dataset.listed || null,
     soldAt: node.dataset.sold || null,
     title: node.querySelector('.card__title')?.textContent || '',

@@ -33,6 +33,15 @@ test('product structured data has the fields Google needs', () => {
   assert.equal(product.offers.availability, 'https://schema.org/SoldOut');
   assert.equal(product.offers.itemCondition, 'https://schema.org/UsedCondition');
   assert.deepEqual(product.image, ['l']);
+  assert.equal(product.offers.priceSpecification, undefined);
+});
+
+test('a reduced item gives Google its old price as a strikethrough price, until it sells', () => {
+  const url = `${siteUrl}item/charizard/`;
+  const item = { id: 'ebay-1', title: 'Charizard', price: 15, wasPrice: 20, currency: 'GBP', status: 'available', url: 'https://www.ebay.co.uk/itm/1', images: [], summary: 'x' };
+  assert.deepEqual(seo.product(siteUrl, url, item).offers.priceSpecification, { '@type': 'UnitPriceSpecification', priceType: 'https://schema.org/StrikethroughPrice', price: '20.00', priceCurrency: 'GBP' });
+  assert.equal(seo.product(siteUrl, url, { ...item, status: 'sold' }).offers.priceSpecification, undefined);
+  assert.equal(seo.product(siteUrl, url, { ...item, wasPrice: null }).offers.priceSpecification, undefined);
 });
 
 test('breadcrumbs are numbered from Home', () => {

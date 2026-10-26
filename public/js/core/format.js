@@ -10,6 +10,14 @@ export function formatPrice(value, currency = 'GBP') {
   return money.get(code).format(amount);
 }
 
+export function reduction(item) {
+  const now = Number(item?.price);
+  const was = Number(item?.wasPrice);
+  if (!Number.isFinite(now) || !Number.isFinite(was) || was <= now) return null;
+  const currency = item.currency || 'GBP';
+  return { was: formatPrice(was, currency), save: formatPrice(Math.round((was - now) * 100) / 100, currency) };
+}
+
 export const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
 const LONG_DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: TIME_ZONE });

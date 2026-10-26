@@ -1,8 +1,8 @@
-import { formatPrice } from '../core/format.js';
 import { itemSummary } from '../core/item.js';
 import { SOURCES, categoryPath, isSold } from '../core/shop.js';
 import { busy } from './busy.js';
 import { el, icon, rootUrl } from './dom.js';
+import { priceNodes } from './render.js';
 import { toast } from './toast.js';
 
 const EXT = { target: '_blank', rel: 'noopener noreferrer', 'aria-describedby': 'new-tab' };
@@ -47,7 +47,7 @@ export function showLive(article, item) {
   article.dataset.status = sold ? 'sold' : 'available';
   const price = article.querySelector('[data-price]');
   if (price) {
-    price.textContent = sold ? '' : formatPrice(item.price, item.currency);
+    price.replaceChildren(...(sold ? [] : priceNodes(item)));
     price.hidden = sold;
   }
   const status = article.querySelector('[data-status-text] span:last-child');
